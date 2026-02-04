@@ -104,12 +104,16 @@ char *basic_get(amqp_connection_state_t connection_state_,
       amqp_read_message(connection_state_, fixed_channel_id, &message, 0);
   assert(rpc_reply.reply_type == AMQP_RESPONSE_NORMAL);
 
-  char *body = malloc(message.body.len);
+  auto body_len = message.body.len;
+  auto alloc_len = body_len > 0 ? body_len : (size_t)1;
+  auto body = (char *)calloc(alloc_len, 1);
   if (body == nullptr) {
     return nullptr;
   }
-  memcpy(body, message.body.bytes, message.body.len);
-  *out_body_size_ = message.body.len;
+  if (body_len > 0) {
+    memcpy(body, message.body.bytes, body_len);
+  }
+  *out_body_size_ = body_len;
   amqp_destroy_message(&message);
 
   return body;
@@ -148,13 +152,15 @@ char *consume_message(amqp_connection_state_t connection_state_,
       amqp_consume_message(connection_state_, &envelope, &timeout, 0);
   assert(rpc_reply.reply_type == AMQP_RESPONSE_NORMAL);
 
-  *out_body_size_ = envelope.message.body.len;
-  char *body = malloc(*out_body_size_);
+  auto body_len = envelope.message.body.len;
+  *out_body_size_ = body_len;
+  auto alloc_len = body_len > 0 ? body_len : (size_t)1;
+  auto body = (char *)calloc(alloc_len, 1);
   if (body == nullptr) {
     return nullptr;
   }
-  if (*out_body_size_) {
-    memcpy(body, envelope.message.body.bytes, *out_body_size_);
+  if (body_len > 0) {
+    memcpy(body, envelope.message.body.bytes, body_len);
   }
 
   amqp_destroy_envelope(&envelope);
