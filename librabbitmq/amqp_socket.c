@@ -38,17 +38,11 @@
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
                                  amqp_method_number_t *list);
 
-static int amqp_os_socket_init() {
-  return AMQP_STATUS_OK;
-}
+static int amqp_os_socket_init() { return AMQP_STATUS_OK; }
 
-int amqp_os_socket_error() {
-  return errno;
-}
+int amqp_os_socket_error() { return errno; }
 
-int amqp_os_socket_close(int sockfd) {
-  return close(sockfd);
-}
+int amqp_os_socket_close(int sockfd) { return close(sockfd); }
 
 ssize_t amqp_socket_send(amqp_socket_t *self, const void *buf, size_t len,
                          int flags) {
@@ -86,7 +80,7 @@ int amqp_socket_close(amqp_socket_t *self, amqp_socket_close_enum force) {
 void amqp_socket_delete(amqp_socket_t *self) {
   if (self) {
     assert(self->klass->delete);
-    self->klass->delete (self);
+    self->klass->delete(self);
   }
 }
 
@@ -344,8 +338,8 @@ int amqp_open_socket_inner(char const *hostname, int portnumber,
   hint.ai_socktype = SOCK_STREAM;
   hint.ai_protocol = IPPROTO_TCP;
 
-  auto portnumber_len = snprintf(portnumber_string, sizeof(portnumber_string),
-                                 "%d", portnumber);
+  auto portnumber_len =
+      snprintf(portnumber_string, sizeof(portnumber_string), "%d", portnumber);
   if (portnumber_len < 0 ||
       (size_t)portnumber_len >= sizeof(portnumber_string)) {
     return AMQP_STATUS_INVALID_PARAMETER;

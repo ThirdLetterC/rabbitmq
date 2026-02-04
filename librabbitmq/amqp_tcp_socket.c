@@ -10,12 +10,12 @@
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <sys/socket.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 
-#include "rabbitmq-c/amqp_socket.h"
 #include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_socket.h"
 #include "rabbitmq-c/tcp_socket.h"
 
 struct amqp_tcp_socket_t {

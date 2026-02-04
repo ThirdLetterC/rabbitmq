@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "rabbitmq-c/amqp.h"
 #include "rabbitmq-c/amqp_private.h"
 #include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/amqp.h"
 
 static int amqp_basic_properties_clone(amqp_basic_properties_t *original,
                                        amqp_basic_properties_t *clone,
@@ -19,7 +19,7 @@ static int amqp_basic_properties_clone(amqp_basic_properties_t *original,
     clone = amqp_empty_bytes;                          \
   } else {                                             \
     amqp_pool_alloc_bytes(pool, original.len, &clone); \
-    if (nullptr == clone.bytes) {                         \
+    if (nullptr == clone.bytes) {                      \
       return AMQP_STATUS_NO_MEMORY;                    \
     }                                                  \
     memcpy(clone.bytes, original.bytes, clone.len);    \

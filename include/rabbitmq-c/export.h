@@ -5,24 +5,24 @@
 #define RABBITMQ_C_EXPORT_H
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-  #if defined(AMQP_STATIC)
-    #define AMQP_EXPORT
-    #define AMQP_DEPRECATED
-  #elif defined(AMQP_EXPORTS)
-    #define AMQP_EXPORT __declspec(dllexport)
-    #define AMQP_DEPRECATED __declspec(deprecated)
-  #else
-    #define AMQP_EXPORT __declspec(dllimport)
-    #define AMQP_DEPRECATED __declspec(deprecated)
-  #endif
+#if defined(AMQP_STATIC)
+#define AMQP_EXPORT
+#define AMQP_DEPRECATED
+#elif defined(AMQP_EXPORTS)
+#define AMQP_EXPORT __declspec(dllexport)
+#define AMQP_DEPRECATED __declspec(deprecated)
 #else
-  #if defined(__GNUC__) || defined(__clang__)
-    #define AMQP_EXPORT __attribute__((visibility("default")))
-    #define AMQP_DEPRECATED __attribute__((deprecated))
-  #else
-    #define AMQP_EXPORT
-    #define AMQP_DEPRECATED
-  #endif
+#define AMQP_EXPORT __declspec(dllimport)
+#define AMQP_DEPRECATED __declspec(deprecated)
+#endif
+#else
+#if defined(__GNUC__) || defined(__clang__)
+#define AMQP_EXPORT __attribute__((visibility("default")))
+#define AMQP_DEPRECATED __attribute__((deprecated))
+#else
+#define AMQP_EXPORT
+#define AMQP_DEPRECATED
+#endif
 #endif
 
 #define AMQP_DEPRECATED_EXPORT AMQP_EXPORT AMQP_DEPRECATED

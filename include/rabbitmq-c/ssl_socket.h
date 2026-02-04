@@ -33,8 +33,8 @@ AMQP_BEGIN_DECLS
  *
  * \since v0.4.0
  */
-[[nodiscard]] AMQP_EXPORT
-amqp_socket_t *AMQP_CALL amqp_ssl_socket_new(amqp_connection_state_t state);
+[[nodiscard]] AMQP_EXPORT amqp_socket_t *AMQP_CALL
+    amqp_ssl_socket_new(amqp_connection_state_t state);
 
 /**
  * Get the internal OpenSSL context. Caveat emptor.
@@ -115,7 +115,7 @@ int AMQP_CALL amqp_ssl_socket_set_key(amqp_socket_t *self, const char *cert,
  * \param [in] the key ID.
  *
  * \return \ref AMQP_STATUS_OK on success an \ref amqp_status_enum value on
- *  failure. May return \ref AMQP_STATUS_SSL_UNIMPLEMENTED if OpenSSL does 
+ *  failure. May return \ref AMQP_STATUS_SSL_UNIMPLEMENTED if OpenSSL does
  *  not support the ENGINE API.
  *
  * \since v0.11.0
@@ -279,8 +279,8 @@ int AMQP_CALL amqp_initialize_ssl_library();
  * has been called.
  *
  * \param [in] engine the engine ID
- * \return AMQP_STATUS_OK on success. May return \ref AMQP_STATUS_SSL_UNIMPLEMENTED
- *   if OpenSSL does not support the ENGINE API.
+ * \return AMQP_STATUS_OK on success. May return \ref
+ * AMQP_STATUS_SSL_UNIMPLEMENTED if OpenSSL does not support the ENGINE API.
  *
  * \since v0.11.0
  */

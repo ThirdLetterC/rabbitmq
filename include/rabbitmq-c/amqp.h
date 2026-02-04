@@ -633,7 +633,7 @@ typedef enum amqp_status_enum_ {
   AMQP_STATUS_SSL_CONNECTION_FAILED = -0x0203, /**< SSL handshake failed. */
   AMQP_STATUS_SSL_SET_ENGINE_FAILED = -0x0204, /**< SSL setting engine failed */
   AMQP_STATUS_SSL_UNIMPLEMENTED = -0x0205, /**< SSL API is not implemented. */
-  _AMQP_STATUS_SSL_NEXT_VALUE = -0x0206        /**< Internal value */
+  _AMQP_STATUS_SSL_NEXT_VALUE = -0x0206    /**< Internal value */
 } amqp_status_enum;
 
 /**
@@ -790,7 +790,8 @@ void AMQP_CALL amqp_pool_alloc_bytes(amqp_pool_t *pool, size_t amount,
  *
  * \since v0.15
  */
-#define amqp_literal_bytes(str) (amqp_bytes_t){sizeof(str) - 1, (void *)str}
+#define amqp_literal_bytes(str) \
+  (amqp_bytes_t) { sizeof(str) - 1, (void *)str }
 
 /**
  * Wraps a c string in an amqp_bytes_t
@@ -825,7 +826,8 @@ amqp_bytes_t AMQP_CALL amqp_cstring_bytes(char const *cstr);
  *
  * \since v0.16
  */
-#define amqp_bytes_from_buffer(ptr, length) (amqp_bytes_t){length, (void *)ptr}
+#define amqp_bytes_from_buffer(ptr, length) \
+  (amqp_bytes_t) { length, (void *)ptr }
 
 /**
  * Duplicates an amqp_bytes_t buffer.
@@ -843,8 +845,8 @@ amqp_bytes_t AMQP_CALL amqp_cstring_bytes(char const *cstr);
  *
  * \since v0.1
  */
-[[nodiscard]] AMQP_EXPORT
-amqp_bytes_t AMQP_CALL amqp_bytes_malloc_dup(amqp_bytes_t src);
+[[nodiscard]] AMQP_EXPORT amqp_bytes_t AMQP_CALL
+    amqp_bytes_malloc_dup(amqp_bytes_t src);
 
 /**
  * Allocates a amqp_bytes_t buffer
@@ -860,8 +862,8 @@ amqp_bytes_t AMQP_CALL amqp_bytes_malloc_dup(amqp_bytes_t src);
  *
  * \since v0.1
  */
-[[nodiscard]] AMQP_EXPORT
-amqp_bytes_t AMQP_CALL amqp_bytes_malloc(size_t amount);
+[[nodiscard]] AMQP_EXPORT amqp_bytes_t AMQP_CALL
+    amqp_bytes_malloc(size_t amount);
 
 /**
  * Frees an amqp_bytes_t buffer
@@ -892,8 +894,8 @@ void AMQP_CALL amqp_bytes_free(amqp_bytes_t bytes);
  *
  * \since v0.1
  */
-[[nodiscard]] AMQP_EXPORT
-amqp_connection_state_t AMQP_CALL amqp_new_connection();
+[[nodiscard]] AMQP_EXPORT amqp_connection_state_t AMQP_CALL
+    amqp_new_connection();
 
 /**
  * Get the underlying socket descriptor for the connection
@@ -1531,8 +1533,8 @@ amqp_rpc_reply_t AMQP_CALL amqp_simple_rpc(
  * \param [in] request_id the method number of the request
  * \param [in] reply_id the method number expected in response
  * \param [in] decoded_request_method the request method
- * \return a pointer to the method returned from the broker, or nullptr on error.
- *  On error amqp_get_rpc_reply() will return an amqp_rpc_reply_t with
+ * \return a pointer to the method returned from the broker, or nullptr on
+ * error. On error amqp_get_rpc_reply() will return an amqp_rpc_reply_t with
  *  details on the error that occurred.
  *
  * \since v0.1
@@ -2244,7 +2246,8 @@ int AMQP_CALL amqp_socket_get_sockfd(amqp_socket_t *self);
  * Get the socket object associated with a amqp_connection_state_t
  *
  * \param [in] state the connection object to get the socket from
- * \return a pointer to the socket object, or nullptr if one has not been assigned
+ * \return a pointer to the socket object, or nullptr if one has not been
+ * assigned
  *
  * \since v0.4.0
  */
@@ -2295,8 +2298,8 @@ amqp_table_t *AMQP_CALL
  *
  * \param [in] state the connection object
  * \return a struct timeval representing the current login timeout for the state
- *  object. A nullptr value represents an infinite timeout. The memory returned is
- *  owned by the connection object.
+ *  object. A nullptr value represents an infinite timeout. The memory returned
+ * is owned by the connection object.
  *
  * \since v0.9.0
  */
@@ -2320,9 +2323,9 @@ struct timeval *AMQP_CALL
  *
  * \param [in] state the connection object
  * \param [in] timeout a struct timeval* representing new login timeout for the
- *  state object. nullptr represents an infinite timeout. The value of timeout is
- *  copied internally, the caller is responsible for ownership of the passed in
- *  pointer, it does not need to remain valid after this function is called.
+ *  state object. nullptr represents an infinite timeout. The value of timeout
+ * is copied internally, the caller is responsible for ownership of the passed
+ * in pointer, it does not need to remain valid after this function is called.
  * \return AMQP_STATUS_OK on success.
  *
  * \since v0.9.0
@@ -2351,8 +2354,8 @@ int AMQP_CALL amqp_set_handshake_timeout(amqp_connection_state_t state,
  *
  * \param [in] state the connection object
  * \return a struct timeval representing the current RPC timeout for the state
- * object. A nullptr value represents an infinite timeout. The memory returned is
- * owned by the connection object.
+ * object. A nullptr value represents an infinite timeout. The memory returned
+ * is owned by the connection object.
  *
  * \since v0.9.0
  */
@@ -2393,8 +2396,8 @@ int AMQP_CALL amqp_set_rpc_timeout(amqp_connection_state_t state,
  * Possible payload permutations for publisher confirms.
  **/
 typedef union amqp_publisher_confirm_payload_t_ {
-  amqp_basic_ack_t ack; /* basic.ack */
-  amqp_basic_nack_t nack; /* basic.nack */
+  amqp_basic_ack_t ack;       /* basic.ack */
+  amqp_basic_nack_t nack;     /* basic.nack */
   amqp_basic_reject_t reject; /* basic.reject */
 } amqp_publisher_confirm_payload_t;
 
@@ -2402,7 +2405,9 @@ typedef union amqp_publisher_confirm_payload_t_ {
  * Return information from publisher confirm wait
  **/
 typedef struct amqp_publisher_confirm_t_ {
-  amqp_publisher_confirm_payload_t payload; /* The response payload; check the `method` value to see which value you should use in the union */
+  amqp_publisher_confirm_payload_t payload; /* The response payload; check the
+                                               `method` value to see which value
+                                               you should use in the union */
   amqp_channel_t channel; /* The channel where the confirmation was received */
   amqp_method_number_t method; /* The method which was received */
 } amqp_publisher_confirm_t;
@@ -2422,14 +2427,16 @@ typedef struct amqp_publisher_confirm_t_ {
  * When a publisher confirm is received, `reply_type` will equal
  * `AMQP_RESPONSE_NORMAL`, and the `result` out parameter will
  * contain all of the information you need:
- * 
- * - The `channel` will identify which channel the publisher confirm was received on
+ *
+ * - The `channel` will identify which channel the publisher confirm was
+ * received on
  * - The `method` will tell you whether this is an `ack`, `nack`, or `reject`
- * - The `payload` is a union, and based on the `method` it will use one of `amqp_basic_ack_t`, `amqp_basic_nack_t`, or `amqp_basic_reject_t`
+ * - The `payload` is a union, and based on the `method` it will use one of
+ * `amqp_basic_ack_t`, `amqp_basic_nack_t`, or `amqp_basic_reject_t`
  *
  * \param [in] state connection state
- * \param [in] timeout when waiting for the frame. Passing nullptr will result in
- * blocking behavior
+ * \param [in] timeout when waiting for the frame. Passing nullptr will result
+ * in blocking behavior
  * \param [out] The result of the publisher confirm wait.
  */
 AMQP_EXPORT

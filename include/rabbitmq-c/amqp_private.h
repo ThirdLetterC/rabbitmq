@@ -63,8 +63,7 @@ typedef enum amqp_status_private_enum_ {
 static constexpr size_t HEADER_SIZE = 7;
 static constexpr size_t FOOTER_SIZE = 1;
 
-static constexpr uint8_t AMQP_PSEUDOFRAME_PROTOCOL_HEADER =
-    (uint8_t)'A';
+static constexpr uint8_t AMQP_PSEUDOFRAME_PROTOCOL_HEADER = (uint8_t)'A';
 
 typedef struct amqp_link_t_ {
   struct amqp_link_t_ *next;
@@ -260,9 +259,9 @@ DECLARE_CODEC_BASE_TYPE(64)
 static inline int amqp_encode_bytes(amqp_bytes_t encoded, size_t *offset,
                                     amqp_bytes_t input) {
   size_t o = *offset;
-  /* The memcpy below has undefined behavior if the input is nullptr. It is valid
-   * for a 0-length amqp_bytes_t to have .bytes == nullptr. Thus we should check
-   * before encoding.
+  /* The memcpy below has undefined behavior if the input is nullptr. It is
+   * valid for a 0-length amqp_bytes_t to have .bytes == nullptr. Thus we should
+   * check before encoding.
    */
   if (input.len == 0) {
     return 1;

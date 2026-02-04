@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp_socket.h"
 #include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_socket.h"
 #include "rabbitmq-c/amqp_time.h"
 #include "rabbitmq-c/tcp_socket.h"
 

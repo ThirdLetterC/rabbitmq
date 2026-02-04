@@ -6,8 +6,8 @@
 #include <sys/time.h>
 
 #include "rabbitmq-c/amqp.h"
-#include "rabbitmq-c/tcp_socket.h"
 #include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq-c/tcp_socket.h"
 
 #ifdef NDEBUG
 #undef NDEBUG

@@ -43,8 +43,6 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
                                 int exclusive) {
   amqp_bytes_t queue_bytes = cstring_bytes(queue);
 
-  char *routing_key_rest;
-  char *routing_key_token;
   char *routing_tmp;
   int routing_key_count = 0;
 
@@ -88,16 +86,33 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
         exit(1);
       }
 
-      for (routing_key_token =
-               strtok_r(routing_tmp, listen_keys_delimiter, &routing_key_rest);
-           nullptr != routing_key_token && routing_key_count < max_listen_keys - 1;
-           routing_key_token =
-               strtok_r(nullptr, listen_keys_delimiter, &routing_key_rest)) {
+      auto segment_start = routing_tmp;
+      while (*segment_start != '\0' &&
+             strchr(listen_keys_delimiter, *segment_start) != nullptr) {
+        ++segment_start;
+      }
+
+      while (*segment_start != '\0' &&
+             routing_key_count < max_listen_keys - 1) {
+        auto segment_end = strpbrk(segment_start, listen_keys_delimiter);
+        if (segment_end != nullptr) {
+          *segment_end = '\0';
+        }
 
         if (!amqp_queue_bind(conn, 1, queue_bytes, eb,
-                             cstring_bytes(routing_key_token),
-                             amqp_empty_table)) {
+                             cstring_bytes(segment_start), amqp_empty_table)) {
           die_rpc(amqp_get_rpc_reply(conn), "queue.bind");
+        }
+        ++routing_key_count;
+
+        if (segment_end == nullptr) {
+          break;
+        }
+
+        segment_start = segment_end + 1;
+        while (*segment_start != '\0' &&
+               strchr(listen_keys_delimiter, *segment_start) != nullptr) {
+          ++segment_start;
         }
       }
       free(routing_tmp);
@@ -122,8 +137,7 @@ static void do_consume(amqp_connection_state_t conn, amqp_bytes_t queue,
 
   /* if there is a maximum number of messages to be received at a time, set the
    * qos to match */
-  if (prefetch_count > 0 &&
-      prefetch_count <= amqp_consume_max_prefetch_count) {
+  if (prefetch_count > 0 && prefetch_count <= amqp_consume_max_prefetch_count) {
     /* the maximum number of messages to be received at a time must be less
      * than the global maximum number of messages. */
     if (!(count > 0 && count <= amqp_consume_max_prefetch_count &&

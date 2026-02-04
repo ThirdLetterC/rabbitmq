@@ -12,35 +12,55 @@
 
 AMQP_BEGIN_DECLS
 
-static constexpr uint8_t AMQP_PROTOCOL_VERSION_MAJOR = 0; /**< AMQP protocol version major */
-static constexpr uint8_t AMQP_PROTOCOL_VERSION_MINOR = 9; /**< AMQP protocol version minor */
-static constexpr uint8_t AMQP_PROTOCOL_VERSION_REVISION = 1; /**< AMQP protocol version revision */
+static constexpr uint8_t AMQP_PROTOCOL_VERSION_MAJOR =
+    0; /**< AMQP protocol version major */
+static constexpr uint8_t AMQP_PROTOCOL_VERSION_MINOR =
+    9; /**< AMQP protocol version minor */
+static constexpr uint8_t AMQP_PROTOCOL_VERSION_REVISION =
+    1; /**< AMQP protocol version revision */
 static constexpr uint16_t AMQP_PROTOCOL_PORT = 5'672; /**< Default AMQP Port */
 static constexpr uint8_t AMQP_FRAME_METHOD = 1; /**< Constant: FRAME-METHOD */
 static constexpr uint8_t AMQP_FRAME_HEADER = 2; /**< Constant: FRAME-HEADER */
-static constexpr uint8_t AMQP_FRAME_BODY = 3; /**< Constant: FRAME-BODY */
-static constexpr uint8_t AMQP_FRAME_HEARTBEAT = 8; /**< Constant: FRAME-HEARTBEAT */
-static constexpr uint32_t AMQP_FRAME_MIN_SIZE = 4'096; /**< Constant: FRAME-MIN-SIZE */
+static constexpr uint8_t AMQP_FRAME_BODY = 3;   /**< Constant: FRAME-BODY */
+static constexpr uint8_t AMQP_FRAME_HEARTBEAT =
+    8; /**< Constant: FRAME-HEARTBEAT */
+static constexpr uint32_t AMQP_FRAME_MIN_SIZE =
+    4'096;                                     /**< Constant: FRAME-MIN-SIZE */
 static constexpr uint8_t AMQP_FRAME_END = 206; /**< Constant: FRAME-END */
-static constexpr uint16_t AMQP_REPLY_SUCCESS = 200; /**< Constant: REPLY-SUCCESS */
-static constexpr uint16_t AMQP_CONTENT_TOO_LARGE = 311; /**< Constant: CONTENT-TOO-LARGE */
+static constexpr uint16_t AMQP_REPLY_SUCCESS =
+    200; /**< Constant: REPLY-SUCCESS */
+static constexpr uint16_t AMQP_CONTENT_TOO_LARGE =
+    311; /**< Constant: CONTENT-TOO-LARGE */
 static constexpr uint16_t AMQP_NO_ROUTE = 312; /**< Constant: NO-ROUTE */
-static constexpr uint16_t AMQP_NO_CONSUMERS = 313; /**< Constant: NO-CONSUMERS */
-static constexpr uint16_t AMQP_ACCESS_REFUSED = 403; /**< Constant: ACCESS-REFUSED */
+static constexpr uint16_t AMQP_NO_CONSUMERS =
+    313; /**< Constant: NO-CONSUMERS */
+static constexpr uint16_t AMQP_ACCESS_REFUSED =
+    403;                                        /**< Constant: ACCESS-REFUSED */
 static constexpr uint16_t AMQP_NOT_FOUND = 404; /**< Constant: NOT-FOUND */
-static constexpr uint16_t AMQP_RESOURCE_LOCKED = 405; /**< Constant: RESOURCE-LOCKED */
-static constexpr uint16_t AMQP_PRECONDITION_FAILED = 406; /**< Constant: PRECONDITION-FAILED */
-static constexpr uint16_t AMQP_CONNECTION_FORCED = 320; /**< Constant: CONNECTION-FORCED */
-static constexpr uint16_t AMQP_INVALID_PATH = 402; /**< Constant: INVALID-PATH */
+static constexpr uint16_t AMQP_RESOURCE_LOCKED =
+    405; /**< Constant: RESOURCE-LOCKED */
+static constexpr uint16_t AMQP_PRECONDITION_FAILED =
+    406; /**< Constant: PRECONDITION-FAILED */
+static constexpr uint16_t AMQP_CONNECTION_FORCED =
+    320; /**< Constant: CONNECTION-FORCED */
+static constexpr uint16_t AMQP_INVALID_PATH =
+    402;                                          /**< Constant: INVALID-PATH */
 static constexpr uint16_t AMQP_FRAME_ERROR = 501; /**< Constant: FRAME-ERROR */
-static constexpr uint16_t AMQP_SYNTAX_ERROR = 502; /**< Constant: SYNTAX-ERROR */
-static constexpr uint16_t AMQP_COMMAND_INVALID = 503; /**< Constant: COMMAND-INVALID */
-static constexpr uint16_t AMQP_CHANNEL_ERROR = 504; /**< Constant: CHANNEL-ERROR */
-static constexpr uint16_t AMQP_UNEXPECTED_FRAME = 505; /**< Constant: UNEXPECTED-FRAME */
-static constexpr uint16_t AMQP_RESOURCE_ERROR = 506; /**< Constant: RESOURCE-ERROR */
+static constexpr uint16_t AMQP_SYNTAX_ERROR =
+    502; /**< Constant: SYNTAX-ERROR */
+static constexpr uint16_t AMQP_COMMAND_INVALID =
+    503; /**< Constant: COMMAND-INVALID */
+static constexpr uint16_t AMQP_CHANNEL_ERROR =
+    504; /**< Constant: CHANNEL-ERROR */
+static constexpr uint16_t AMQP_UNEXPECTED_FRAME =
+    505; /**< Constant: UNEXPECTED-FRAME */
+static constexpr uint16_t AMQP_RESOURCE_ERROR =
+    506; /**< Constant: RESOURCE-ERROR */
 static constexpr uint16_t AMQP_NOT_ALLOWED = 530; /**< Constant: NOT-ALLOWED */
-static constexpr uint16_t AMQP_NOT_IMPLEMENTED = 540; /**< Constant: NOT-IMPLEMENTED */
-static constexpr uint16_t AMQP_INTERNAL_ERROR = 541; /**< Constant: INTERNAL-ERROR */
+static constexpr uint16_t AMQP_NOT_IMPLEMENTED =
+    540; /**< Constant: NOT-IMPLEMENTED */
+static constexpr uint16_t AMQP_INTERNAL_ERROR =
+    541; /**< Constant: INTERNAL-ERROR */
 
 /* Function prototypes. */
 
@@ -146,7 +166,9 @@ int AMQP_CALL amqp_encode_properties(uint16_t class_id, void *decoded,
 
 /* Method field records. */
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_START_METHOD = ((amqp_method_number_t)0x000A000A); /**< connection.start method id @internal 10, 10; 655370 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_START_METHOD =
+    ((amqp_method_number_t)0x000A000A); /**< connection.start method id
+                                           @internal 10, 10; 655370 */
 /** connection.start method fields */
 typedef struct amqp_connection_start_t_ {
   uint8_t version_major;          /**< version-major */
@@ -156,7 +178,9 @@ typedef struct amqp_connection_start_t_ {
   amqp_bytes_t locales;           /**< locales */
 } amqp_connection_start_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_START_OK_METHOD = ((amqp_method_number_t)0x000A000B); /**< connection.start-ok method id @internal 10, 11; 655371 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_START_OK_METHOD =
+    ((amqp_method_number_t)0x000A000B); /**< connection.start-ok method id
+                                           @internal 10, 11; 655371 */
 /** connection.start-ok method fields */
 typedef struct amqp_connection_start_ok_t_ {
   amqp_table_t client_properties; /**< client-properties */
@@ -165,19 +189,25 @@ typedef struct amqp_connection_start_ok_t_ {
   amqp_bytes_t locale;            /**< locale */
 } amqp_connection_start_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_SECURE_METHOD = ((amqp_method_number_t)0x000A0014); /**< connection.secure method id @internal 10, 20; 655380 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_SECURE_METHOD =
+    ((amqp_method_number_t)0x000A0014); /**< connection.secure method id
+                                           @internal 10, 20; 655380 */
 /** connection.secure method fields */
 typedef struct amqp_connection_secure_t_ {
   amqp_bytes_t challenge; /**< challenge */
 } amqp_connection_secure_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_SECURE_OK_METHOD = ((amqp_method_number_t)0x000A0015); /**< connection.secure-ok method id @internal 10, 21; 655381 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_SECURE_OK_METHOD =
+    ((amqp_method_number_t)0x000A0015); /**< connection.secure-ok method id
+                                           @internal 10, 21; 655381 */
 /** connection.secure-ok method fields */
 typedef struct amqp_connection_secure_ok_t_ {
   amqp_bytes_t response; /**< response */
 } amqp_connection_secure_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_TUNE_METHOD = ((amqp_method_number_t)0x000A001E); /**< connection.tune method id @internal 10, 30; 655390 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_TUNE_METHOD =
+    ((amqp_method_number_t)0x000A001E); /**< connection.tune method id @internal
+                                           10, 30; 655390 */
 /** connection.tune method fields */
 typedef struct amqp_connection_tune_t_ {
   uint16_t channel_max; /**< channel-max */
@@ -185,7 +215,9 @@ typedef struct amqp_connection_tune_t_ {
   uint16_t heartbeat;   /**< heartbeat */
 } amqp_connection_tune_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_TUNE_OK_METHOD = ((amqp_method_number_t)0x000A001F); /**< connection.tune-ok method id @internal 10, 31; 655391 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_TUNE_OK_METHOD =
+    ((amqp_method_number_t)0x000A001F); /**< connection.tune-ok method id
+                                           @internal 10, 31; 655391 */
 /** connection.tune-ok method fields */
 typedef struct amqp_connection_tune_ok_t_ {
   uint16_t channel_max; /**< channel-max */
@@ -193,7 +225,9 @@ typedef struct amqp_connection_tune_ok_t_ {
   uint16_t heartbeat;   /**< heartbeat */
 } amqp_connection_tune_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_OPEN_METHOD = ((amqp_method_number_t)0x000A0028); /**< connection.open method id @internal 10, 40; 655400 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_OPEN_METHOD =
+    ((amqp_method_number_t)0x000A0028); /**< connection.open method id @internal
+                                           10, 40; 655400 */
 /** connection.open method fields */
 typedef struct amqp_connection_open_t_ {
   amqp_bytes_t virtual_host; /**< virtual-host */
@@ -201,13 +235,17 @@ typedef struct amqp_connection_open_t_ {
   amqp_boolean_t insist;     /**< insist */
 } amqp_connection_open_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_OPEN_OK_METHOD = ((amqp_method_number_t)0x000A0029); /**< connection.open-ok method id @internal 10, 41; 655401 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_OPEN_OK_METHOD =
+    ((amqp_method_number_t)0x000A0029); /**< connection.open-ok method id
+                                           @internal 10, 41; 655401 */
 /** connection.open-ok method fields */
 typedef struct amqp_connection_open_ok_t_ {
   amqp_bytes_t known_hosts; /**< known-hosts */
 } amqp_connection_open_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_CLOSE_METHOD = ((amqp_method_number_t)0x000A0032); /**< connection.close method id @internal 10, 50; 655410 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_CLOSE_METHOD =
+    ((amqp_method_number_t)0x000A0032); /**< connection.close method id
+                                           @internal 10, 50; 655410 */
 /** connection.close method fields */
 typedef struct amqp_connection_close_t_ {
   uint16_t reply_code;     /**< reply-code */
@@ -216,62 +254,82 @@ typedef struct amqp_connection_close_t_ {
   uint16_t method_id;      /**< method-id */
 } amqp_connection_close_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_CLOSE_OK_METHOD = ((amqp_method_number_t)0x000A0033); /**< connection.close-ok method id @internal 10, 51; 655411 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_CLOSE_OK_METHOD =
+    ((amqp_method_number_t)0x000A0033); /**< connection.close-ok method id
+                                           @internal 10, 51; 655411 */
 /** connection.close-ok method fields */
 typedef struct amqp_connection_close_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_connection_close_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_BLOCKED_METHOD = ((amqp_method_number_t)0x000A003C); /**< connection.blocked method id @internal 10, 60; 655420 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_BLOCKED_METHOD =
+    ((amqp_method_number_t)0x000A003C); /**< connection.blocked method id
+                                           @internal 10, 60; 655420 */
 /** connection.blocked method fields */
 typedef struct amqp_connection_blocked_t_ {
   amqp_bytes_t reason; /**< reason */
 } amqp_connection_blocked_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_UNBLOCKED_METHOD = ((amqp_method_number_t)0x000A003D); /**< connection.unblocked method id @internal 10, 61; 655421 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_UNBLOCKED_METHOD =
+    ((amqp_method_number_t)0x000A003D); /**< connection.unblocked method id
+                                           @internal 10, 61; 655421 */
 /** connection.unblocked method fields */
 typedef struct amqp_connection_unblocked_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_connection_unblocked_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_UPDATE_SECRET_METHOD = ((amqp_method_number_t)0x000A0046); /**< connection.update-secret method id @internal 10, 70; 655430 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_UPDATE_SECRET_METHOD =
+    ((amqp_method_number_t)0x000A0046); /**< connection.update-secret method id
+                                           @internal 10, 70; 655430 */
 /** connection.update-secret method fields */
 typedef struct amqp_connection_update_secret_t_ {
   amqp_bytes_t new_secret; /**< new-secret */
   amqp_bytes_t reason;     /**< reason */
 } amqp_connection_update_secret_t;
 
-static constexpr amqp_method_number_t AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD = ((amqp_method_number_t)0x000A0047); /**< connection.update-secret-ok method id @internal 10, 71; 655431 */
+static constexpr amqp_method_number_t AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD =
+    ((amqp_method_number_t)0x000A0047); /**< connection.update-secret-ok method
+                                           id @internal 10, 71; 655431 */
 /** connection.update-secret-ok method fields */
 typedef struct amqp_connection_update_secret_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_connection_update_secret_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_OPEN_METHOD = ((amqp_method_number_t)0x0014000A); /**< channel.open method id @internal 20, 10; 1310730 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_OPEN_METHOD =
+    ((amqp_method_number_t)0x0014000A); /**< channel.open method id @internal
+                                           20, 10; 1310730 */
 /** channel.open method fields */
 typedef struct amqp_channel_open_t_ {
   amqp_bytes_t out_of_band; /**< out-of-band */
 } amqp_channel_open_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_OPEN_OK_METHOD = ((amqp_method_number_t)0x0014000B); /**< channel.open-ok method id @internal 20, 11; 1310731 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_OPEN_OK_METHOD =
+    ((amqp_method_number_t)0x0014000B); /**< channel.open-ok method id @internal
+                                           20, 11; 1310731 */
 /** channel.open-ok method fields */
 typedef struct amqp_channel_open_ok_t_ {
   amqp_bytes_t channel_id; /**< channel-id */
 } amqp_channel_open_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_FLOW_METHOD = ((amqp_method_number_t)0x00140014); /**< channel.flow method id @internal 20, 20; 1310740 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_FLOW_METHOD =
+    ((amqp_method_number_t)0x00140014); /**< channel.flow method id @internal
+                                           20, 20; 1310740 */
 /** channel.flow method fields */
 typedef struct amqp_channel_flow_t_ {
   amqp_boolean_t active; /**< active */
 } amqp_channel_flow_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_FLOW_OK_METHOD = ((amqp_method_number_t)0x00140015); /**< channel.flow-ok method id @internal 20, 21; 1310741 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_FLOW_OK_METHOD =
+    ((amqp_method_number_t)0x00140015); /**< channel.flow-ok method id @internal
+                                           20, 21; 1310741 */
 /** channel.flow-ok method fields */
 typedef struct amqp_channel_flow_ok_t_ {
   amqp_boolean_t active; /**< active */
 } amqp_channel_flow_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_CLOSE_METHOD = ((amqp_method_number_t)0x00140028); /**< channel.close method id @internal 20, 40; 1310760 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_CLOSE_METHOD =
+    ((amqp_method_number_t)0x00140028); /**< channel.close method id @internal
+                                           20, 40; 1310760 */
 /** channel.close method fields */
 typedef struct amqp_channel_close_t_ {
   uint16_t reply_code;     /**< reply-code */
@@ -280,13 +338,17 @@ typedef struct amqp_channel_close_t_ {
   uint16_t method_id;      /**< method-id */
 } amqp_channel_close_t;
 
-static constexpr amqp_method_number_t AMQP_CHANNEL_CLOSE_OK_METHOD = ((amqp_method_number_t)0x00140029); /**< channel.close-ok method id @internal 20, 41; 1310761 */
+static constexpr amqp_method_number_t AMQP_CHANNEL_CLOSE_OK_METHOD =
+    ((amqp_method_number_t)0x00140029); /**< channel.close-ok method id
+                                           @internal 20, 41; 1310761 */
 /** channel.close-ok method fields */
 typedef struct amqp_channel_close_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_channel_close_ok_t;
 
-static constexpr amqp_method_number_t AMQP_ACCESS_REQUEST_METHOD = ((amqp_method_number_t)0x001E000A); /**< access.request method id @internal 30, 10; 1966090 */
+static constexpr amqp_method_number_t AMQP_ACCESS_REQUEST_METHOD =
+    ((amqp_method_number_t)0x001E000A); /**< access.request method id @internal
+                                           30, 10; 1966090 */
 /** access.request method fields */
 typedef struct amqp_access_request_t_ {
   amqp_bytes_t realm;       /**< realm */
@@ -297,13 +359,17 @@ typedef struct amqp_access_request_t_ {
   amqp_boolean_t read;      /**< read */
 } amqp_access_request_t;
 
-static constexpr amqp_method_number_t AMQP_ACCESS_REQUEST_OK_METHOD = ((amqp_method_number_t)0x001E000B); /**< access.request-ok method id @internal 30, 11; 1966091 */
+static constexpr amqp_method_number_t AMQP_ACCESS_REQUEST_OK_METHOD =
+    ((amqp_method_number_t)0x001E000B); /**< access.request-ok method id
+                                           @internal 30, 11; 1966091 */
 /** access.request-ok method fields */
 typedef struct amqp_access_request_ok_t_ {
   uint16_t ticket; /**< ticket */
 } amqp_access_request_ok_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_DECLARE_METHOD = ((amqp_method_number_t)0x0028000A); /**< exchange.declare method id @internal 40, 10; 2621450 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_DECLARE_METHOD =
+    ((amqp_method_number_t)0x0028000A); /**< exchange.declare method id
+                                           @internal 40, 10; 2621450 */
 /** exchange.declare method fields */
 typedef struct amqp_exchange_declare_t_ {
   uint16_t ticket;            /**< ticket */
@@ -317,13 +383,17 @@ typedef struct amqp_exchange_declare_t_ {
   amqp_table_t arguments;     /**< arguments */
 } amqp_exchange_declare_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_DECLARE_OK_METHOD = ((amqp_method_number_t)0x0028000B); /**< exchange.declare-ok method id @internal 40, 11; 2621451 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_DECLARE_OK_METHOD =
+    ((amqp_method_number_t)0x0028000B); /**< exchange.declare-ok method id
+                                           @internal 40, 11; 2621451 */
 /** exchange.declare-ok method fields */
 typedef struct amqp_exchange_declare_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_exchange_declare_ok_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_DELETE_METHOD = ((amqp_method_number_t)0x00280014); /**< exchange.delete method id @internal 40, 20; 2621460 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_DELETE_METHOD =
+    ((amqp_method_number_t)0x00280014); /**< exchange.delete method id @internal
+                                           40, 20; 2621460 */
 /** exchange.delete method fields */
 typedef struct amqp_exchange_delete_t_ {
   uint16_t ticket;          /**< ticket */
@@ -332,13 +402,17 @@ typedef struct amqp_exchange_delete_t_ {
   amqp_boolean_t nowait;    /**< nowait */
 } amqp_exchange_delete_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_DELETE_OK_METHOD = ((amqp_method_number_t)0x00280015); /**< exchange.delete-ok method id @internal 40, 21; 2621461 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_DELETE_OK_METHOD =
+    ((amqp_method_number_t)0x00280015); /**< exchange.delete-ok method id
+                                           @internal 40, 21; 2621461 */
 /** exchange.delete-ok method fields */
 typedef struct amqp_exchange_delete_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_exchange_delete_ok_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_BIND_METHOD = ((amqp_method_number_t)0x0028001E); /**< exchange.bind method id @internal 40, 30; 2621470 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_BIND_METHOD =
+    ((amqp_method_number_t)0x0028001E); /**< exchange.bind method id @internal
+                                           40, 30; 2621470 */
 /** exchange.bind method fields */
 typedef struct amqp_exchange_bind_t_ {
   uint16_t ticket;          /**< ticket */
@@ -349,13 +423,17 @@ typedef struct amqp_exchange_bind_t_ {
   amqp_table_t arguments;   /**< arguments */
 } amqp_exchange_bind_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_BIND_OK_METHOD = ((amqp_method_number_t)0x0028001F); /**< exchange.bind-ok method id @internal 40, 31; 2621471 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_BIND_OK_METHOD =
+    ((amqp_method_number_t)0x0028001F); /**< exchange.bind-ok method id
+                                           @internal 40, 31; 2621471 */
 /** exchange.bind-ok method fields */
 typedef struct amqp_exchange_bind_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_exchange_bind_ok_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_UNBIND_METHOD = ((amqp_method_number_t)0x00280028); /**< exchange.unbind method id @internal 40, 40; 2621480 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_UNBIND_METHOD =
+    ((amqp_method_number_t)0x00280028); /**< exchange.unbind method id @internal
+                                           40, 40; 2621480 */
 /** exchange.unbind method fields */
 typedef struct amqp_exchange_unbind_t_ {
   uint16_t ticket;          /**< ticket */
@@ -366,13 +444,17 @@ typedef struct amqp_exchange_unbind_t_ {
   amqp_table_t arguments;   /**< arguments */
 } amqp_exchange_unbind_t;
 
-static constexpr amqp_method_number_t AMQP_EXCHANGE_UNBIND_OK_METHOD = ((amqp_method_number_t)0x00280033); /**< exchange.unbind-ok method id @internal 40, 51; 2621491 */
+static constexpr amqp_method_number_t AMQP_EXCHANGE_UNBIND_OK_METHOD =
+    ((amqp_method_number_t)0x00280033); /**< exchange.unbind-ok method id
+                                           @internal 40, 51; 2621491 */
 /** exchange.unbind-ok method fields */
 typedef struct amqp_exchange_unbind_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_exchange_unbind_ok_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_DECLARE_METHOD = ((amqp_method_number_t)0x0032000A); /**< queue.declare method id @internal 50, 10; 3276810 */
+static constexpr amqp_method_number_t AMQP_QUEUE_DECLARE_METHOD =
+    ((amqp_method_number_t)0x0032000A); /**< queue.declare method id @internal
+                                           50, 10; 3276810 */
 /** queue.declare method fields */
 typedef struct amqp_queue_declare_t_ {
   uint16_t ticket;            /**< ticket */
@@ -385,7 +467,9 @@ typedef struct amqp_queue_declare_t_ {
   amqp_table_t arguments;     /**< arguments */
 } amqp_queue_declare_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_DECLARE_OK_METHOD = ((amqp_method_number_t)0x0032000B); /**< queue.declare-ok method id @internal 50, 11; 3276811 */
+static constexpr amqp_method_number_t AMQP_QUEUE_DECLARE_OK_METHOD =
+    ((amqp_method_number_t)0x0032000B); /**< queue.declare-ok method id
+                                           @internal 50, 11; 3276811 */
 /** queue.declare-ok method fields */
 typedef struct amqp_queue_declare_ok_t_ {
   amqp_bytes_t queue;      /**< queue */
@@ -393,7 +477,9 @@ typedef struct amqp_queue_declare_ok_t_ {
   uint32_t consumer_count; /**< consumer-count */
 } amqp_queue_declare_ok_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_BIND_METHOD = ((amqp_method_number_t)0x00320014); /**< queue.bind method id @internal 50, 20; 3276820 */
+static constexpr amqp_method_number_t AMQP_QUEUE_BIND_METHOD =
+    ((amqp_method_number_t)0x00320014); /**< queue.bind method id @internal 50,
+                                           20; 3276820 */
 /** queue.bind method fields */
 typedef struct amqp_queue_bind_t_ {
   uint16_t ticket;          /**< ticket */
@@ -404,13 +490,17 @@ typedef struct amqp_queue_bind_t_ {
   amqp_table_t arguments;   /**< arguments */
 } amqp_queue_bind_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_BIND_OK_METHOD = ((amqp_method_number_t)0x00320015); /**< queue.bind-ok method id @internal 50, 21; 3276821 */
+static constexpr amqp_method_number_t AMQP_QUEUE_BIND_OK_METHOD =
+    ((amqp_method_number_t)0x00320015); /**< queue.bind-ok method id @internal
+                                           50, 21; 3276821 */
 /** queue.bind-ok method fields */
 typedef struct amqp_queue_bind_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_queue_bind_ok_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_PURGE_METHOD = ((amqp_method_number_t)0x0032001E); /**< queue.purge method id @internal 50, 30; 3276830 */
+static constexpr amqp_method_number_t AMQP_QUEUE_PURGE_METHOD =
+    ((amqp_method_number_t)0x0032001E); /**< queue.purge method id @internal 50,
+                                           30; 3276830 */
 /** queue.purge method fields */
 typedef struct amqp_queue_purge_t_ {
   uint16_t ticket;       /**< ticket */
@@ -418,13 +508,17 @@ typedef struct amqp_queue_purge_t_ {
   amqp_boolean_t nowait; /**< nowait */
 } amqp_queue_purge_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_PURGE_OK_METHOD = ((amqp_method_number_t)0x0032001F); /**< queue.purge-ok method id @internal 50, 31; 3276831 */
+static constexpr amqp_method_number_t AMQP_QUEUE_PURGE_OK_METHOD =
+    ((amqp_method_number_t)0x0032001F); /**< queue.purge-ok method id @internal
+                                           50, 31; 3276831 */
 /** queue.purge-ok method fields */
 typedef struct amqp_queue_purge_ok_t_ {
   uint32_t message_count; /**< message-count */
 } amqp_queue_purge_ok_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_DELETE_METHOD = ((amqp_method_number_t)0x00320028); /**< queue.delete method id @internal 50, 40; 3276840 */
+static constexpr amqp_method_number_t AMQP_QUEUE_DELETE_METHOD =
+    ((amqp_method_number_t)0x00320028); /**< queue.delete method id @internal
+                                           50, 40; 3276840 */
 /** queue.delete method fields */
 typedef struct amqp_queue_delete_t_ {
   uint16_t ticket;          /**< ticket */
@@ -434,13 +528,17 @@ typedef struct amqp_queue_delete_t_ {
   amqp_boolean_t nowait;    /**< nowait */
 } amqp_queue_delete_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_DELETE_OK_METHOD = ((amqp_method_number_t)0x00320029); /**< queue.delete-ok method id @internal 50, 41; 3276841 */
+static constexpr amqp_method_number_t AMQP_QUEUE_DELETE_OK_METHOD =
+    ((amqp_method_number_t)0x00320029); /**< queue.delete-ok method id @internal
+                                           50, 41; 3276841 */
 /** queue.delete-ok method fields */
 typedef struct amqp_queue_delete_ok_t_ {
   uint32_t message_count; /**< message-count */
 } amqp_queue_delete_ok_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_UNBIND_METHOD = ((amqp_method_number_t)0x00320032); /**< queue.unbind method id @internal 50, 50; 3276850 */
+static constexpr amqp_method_number_t AMQP_QUEUE_UNBIND_METHOD =
+    ((amqp_method_number_t)0x00320032); /**< queue.unbind method id @internal
+                                           50, 50; 3276850 */
 /** queue.unbind method fields */
 typedef struct amqp_queue_unbind_t_ {
   uint16_t ticket;          /**< ticket */
@@ -450,13 +548,17 @@ typedef struct amqp_queue_unbind_t_ {
   amqp_table_t arguments;   /**< arguments */
 } amqp_queue_unbind_t;
 
-static constexpr amqp_method_number_t AMQP_QUEUE_UNBIND_OK_METHOD = ((amqp_method_number_t)0x00320033); /**< queue.unbind-ok method id @internal 50, 51; 3276851 */
+static constexpr amqp_method_number_t AMQP_QUEUE_UNBIND_OK_METHOD =
+    ((amqp_method_number_t)0x00320033); /**< queue.unbind-ok method id @internal
+                                           50, 51; 3276851 */
 /** queue.unbind-ok method fields */
 typedef struct amqp_queue_unbind_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_queue_unbind_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_QOS_METHOD = ((amqp_method_number_t)0x003C000A); /**< basic.qos method id @internal 60, 10; 3932170 */
+static constexpr amqp_method_number_t AMQP_BASIC_QOS_METHOD =
+    ((amqp_method_number_t)0x003C000A); /**< basic.qos method id @internal 60,
+                                           10; 3932170 */
 /** basic.qos method fields */
 typedef struct amqp_basic_qos_t_ {
   uint32_t prefetch_size;  /**< prefetch-size */
@@ -464,13 +566,17 @@ typedef struct amqp_basic_qos_t_ {
   amqp_boolean_t global;   /**< global */
 } amqp_basic_qos_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_QOS_OK_METHOD = ((amqp_method_number_t)0x003C000B); /**< basic.qos-ok method id @internal 60, 11; 3932171 */
+static constexpr amqp_method_number_t AMQP_BASIC_QOS_OK_METHOD =
+    ((amqp_method_number_t)0x003C000B); /**< basic.qos-ok method id @internal
+                                           60, 11; 3932171 */
 /** basic.qos-ok method fields */
 typedef struct amqp_basic_qos_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_basic_qos_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_CONSUME_METHOD = ((amqp_method_number_t)0x003C0014); /**< basic.consume method id @internal 60, 20; 3932180 */
+static constexpr amqp_method_number_t AMQP_BASIC_CONSUME_METHOD =
+    ((amqp_method_number_t)0x003C0014); /**< basic.consume method id @internal
+                                           60, 20; 3932180 */
 /** basic.consume method fields */
 typedef struct amqp_basic_consume_t_ {
   uint16_t ticket;           /**< ticket */
@@ -483,26 +589,34 @@ typedef struct amqp_basic_consume_t_ {
   amqp_table_t arguments;    /**< arguments */
 } amqp_basic_consume_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_CONSUME_OK_METHOD = ((amqp_method_number_t)0x003C0015); /**< basic.consume-ok method id @internal 60, 21; 3932181 */
+static constexpr amqp_method_number_t AMQP_BASIC_CONSUME_OK_METHOD =
+    ((amqp_method_number_t)0x003C0015); /**< basic.consume-ok method id
+                                           @internal 60, 21; 3932181 */
 /** basic.consume-ok method fields */
 typedef struct amqp_basic_consume_ok_t_ {
   amqp_bytes_t consumer_tag; /**< consumer-tag */
 } amqp_basic_consume_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_CANCEL_METHOD = ((amqp_method_number_t)0x003C001E); /**< basic.cancel method id @internal 60, 30; 3932190 */
+static constexpr amqp_method_number_t AMQP_BASIC_CANCEL_METHOD =
+    ((amqp_method_number_t)0x003C001E); /**< basic.cancel method id @internal
+                                           60, 30; 3932190 */
 /** basic.cancel method fields */
 typedef struct amqp_basic_cancel_t_ {
   amqp_bytes_t consumer_tag; /**< consumer-tag */
   amqp_boolean_t nowait;     /**< nowait */
 } amqp_basic_cancel_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_CANCEL_OK_METHOD = ((amqp_method_number_t)0x003C001F); /**< basic.cancel-ok method id @internal 60, 31; 3932191 */
+static constexpr amqp_method_number_t AMQP_BASIC_CANCEL_OK_METHOD =
+    ((amqp_method_number_t)0x003C001F); /**< basic.cancel-ok method id @internal
+                                           60, 31; 3932191 */
 /** basic.cancel-ok method fields */
 typedef struct amqp_basic_cancel_ok_t_ {
   amqp_bytes_t consumer_tag; /**< consumer-tag */
 } amqp_basic_cancel_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_PUBLISH_METHOD = ((amqp_method_number_t)0x003C0028); /**< basic.publish method id @internal 60, 40; 3932200 */
+static constexpr amqp_method_number_t AMQP_BASIC_PUBLISH_METHOD =
+    ((amqp_method_number_t)0x003C0028); /**< basic.publish method id @internal
+                                           60, 40; 3932200 */
 /** basic.publish method fields */
 typedef struct amqp_basic_publish_t_ {
   uint16_t ticket;          /**< ticket */
@@ -512,7 +626,9 @@ typedef struct amqp_basic_publish_t_ {
   amqp_boolean_t immediate; /**< immediate */
 } amqp_basic_publish_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_RETURN_METHOD = ((amqp_method_number_t)0x003C0032); /**< basic.return method id @internal 60, 50; 3932210 */
+static constexpr amqp_method_number_t AMQP_BASIC_RETURN_METHOD =
+    ((amqp_method_number_t)0x003C0032); /**< basic.return method id @internal
+                                           60, 50; 3932210 */
 /** basic.return method fields */
 typedef struct amqp_basic_return_t_ {
   uint16_t reply_code;      /**< reply-code */
@@ -521,7 +637,9 @@ typedef struct amqp_basic_return_t_ {
   amqp_bytes_t routing_key; /**< routing-key */
 } amqp_basic_return_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_DELIVER_METHOD = ((amqp_method_number_t)0x003C003C); /**< basic.deliver method id @internal 60, 60; 3932220 */
+static constexpr amqp_method_number_t AMQP_BASIC_DELIVER_METHOD =
+    ((amqp_method_number_t)0x003C003C); /**< basic.deliver method id @internal
+                                           60, 60; 3932220 */
 /** basic.deliver method fields */
 typedef struct amqp_basic_deliver_t_ {
   amqp_bytes_t consumer_tag;  /**< consumer-tag */
@@ -531,7 +649,9 @@ typedef struct amqp_basic_deliver_t_ {
   amqp_bytes_t routing_key;   /**< routing-key */
 } amqp_basic_deliver_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_GET_METHOD = ((amqp_method_number_t)0x003C0046); /**< basic.get method id @internal 60, 70; 3932230 */
+static constexpr amqp_method_number_t AMQP_BASIC_GET_METHOD =
+    ((amqp_method_number_t)0x003C0046); /**< basic.get method id @internal 60,
+                                           70; 3932230 */
 /** basic.get method fields */
 typedef struct amqp_basic_get_t_ {
   uint16_t ticket;       /**< ticket */
@@ -539,7 +659,9 @@ typedef struct amqp_basic_get_t_ {
   amqp_boolean_t no_ack; /**< no-ack */
 } amqp_basic_get_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_GET_OK_METHOD = ((amqp_method_number_t)0x003C0047); /**< basic.get-ok method id @internal 60, 71; 3932231 */
+static constexpr amqp_method_number_t AMQP_BASIC_GET_OK_METHOD =
+    ((amqp_method_number_t)0x003C0047); /**< basic.get-ok method id @internal
+                                           60, 71; 3932231 */
 /** basic.get-ok method fields */
 typedef struct amqp_basic_get_ok_t_ {
   uint64_t delivery_tag;      /**< delivery-tag */
@@ -549,45 +671,59 @@ typedef struct amqp_basic_get_ok_t_ {
   uint32_t message_count;     /**< message-count */
 } amqp_basic_get_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_GET_EMPTY_METHOD = ((amqp_method_number_t)0x003C0048); /**< basic.get-empty method id @internal 60, 72; 3932232 */
+static constexpr amqp_method_number_t AMQP_BASIC_GET_EMPTY_METHOD =
+    ((amqp_method_number_t)0x003C0048); /**< basic.get-empty method id @internal
+                                           60, 72; 3932232 */
 /** basic.get-empty method fields */
 typedef struct amqp_basic_get_empty_t_ {
   amqp_bytes_t cluster_id; /**< cluster-id */
 } amqp_basic_get_empty_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_ACK_METHOD = ((amqp_method_number_t)0x003C0050); /**< basic.ack method id @internal 60, 80; 3932240 */
+static constexpr amqp_method_number_t AMQP_BASIC_ACK_METHOD =
+    ((amqp_method_number_t)0x003C0050); /**< basic.ack method id @internal 60,
+                                           80; 3932240 */
 /** basic.ack method fields */
 typedef struct amqp_basic_ack_t_ {
   uint64_t delivery_tag;   /**< delivery-tag */
   amqp_boolean_t multiple; /**< multiple */
 } amqp_basic_ack_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_REJECT_METHOD = ((amqp_method_number_t)0x003C005A); /**< basic.reject method id @internal 60, 90; 3932250 */
+static constexpr amqp_method_number_t AMQP_BASIC_REJECT_METHOD =
+    ((amqp_method_number_t)0x003C005A); /**< basic.reject method id @internal
+                                           60, 90; 3932250 */
 /** basic.reject method fields */
 typedef struct amqp_basic_reject_t_ {
   uint64_t delivery_tag;  /**< delivery-tag */
   amqp_boolean_t requeue; /**< requeue */
 } amqp_basic_reject_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_ASYNC_METHOD = ((amqp_method_number_t)0x003C0064); /**< basic.recover-async method id @internal 60, 100; 3932260 */
+static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_ASYNC_METHOD =
+    ((amqp_method_number_t)0x003C0064); /**< basic.recover-async method id
+                                           @internal 60, 100; 3932260 */
 /** basic.recover-async method fields */
 typedef struct amqp_basic_recover_async_t_ {
   amqp_boolean_t requeue; /**< requeue */
 } amqp_basic_recover_async_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_METHOD = ((amqp_method_number_t)0x003C006E); /**< basic.recover method id @internal 60, 110; 3932270 */
+static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_METHOD =
+    ((amqp_method_number_t)0x003C006E); /**< basic.recover method id @internal
+                                           60, 110; 3932270 */
 /** basic.recover method fields */
 typedef struct amqp_basic_recover_t_ {
   amqp_boolean_t requeue; /**< requeue */
 } amqp_basic_recover_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_OK_METHOD = ((amqp_method_number_t)0x003C006F); /**< basic.recover-ok method id @internal 60, 111; 3932271 */
+static constexpr amqp_method_number_t AMQP_BASIC_RECOVER_OK_METHOD =
+    ((amqp_method_number_t)0x003C006F); /**< basic.recover-ok method id
+                                           @internal 60, 111; 3932271 */
 /** basic.recover-ok method fields */
 typedef struct amqp_basic_recover_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_basic_recover_ok_t;
 
-static constexpr amqp_method_number_t AMQP_BASIC_NACK_METHOD = ((amqp_method_number_t)0x003C0078); /**< basic.nack method id @internal 60, 120; 3932280 */
+static constexpr amqp_method_number_t AMQP_BASIC_NACK_METHOD =
+    ((amqp_method_number_t)0x003C0078); /**< basic.nack method id @internal 60,
+                                           120; 3932280 */
 /** basic.nack method fields */
 typedef struct amqp_basic_nack_t_ {
   uint64_t delivery_tag;   /**< delivery-tag */
@@ -595,105 +731,141 @@ typedef struct amqp_basic_nack_t_ {
   amqp_boolean_t requeue;  /**< requeue */
 } amqp_basic_nack_t;
 
-static constexpr amqp_method_number_t AMQP_TX_SELECT_METHOD = ((amqp_method_number_t)0x005A000A); /**< tx.select method id @internal 90, 10; 5898250 */
+static constexpr amqp_method_number_t AMQP_TX_SELECT_METHOD =
+    ((amqp_method_number_t)0x005A000A); /**< tx.select method id @internal 90,
+                                           10; 5898250 */
 /** tx.select method fields */
 typedef struct amqp_tx_select_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_select_t;
 
-static constexpr amqp_method_number_t AMQP_TX_SELECT_OK_METHOD = ((amqp_method_number_t)0x005A000B); /**< tx.select-ok method id @internal 90, 11; 5898251 */
+static constexpr amqp_method_number_t AMQP_TX_SELECT_OK_METHOD =
+    ((amqp_method_number_t)0x005A000B); /**< tx.select-ok method id @internal
+                                           90, 11; 5898251 */
 /** tx.select-ok method fields */
 typedef struct amqp_tx_select_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_select_ok_t;
 
-static constexpr amqp_method_number_t AMQP_TX_COMMIT_METHOD = ((amqp_method_number_t)0x005A0014); /**< tx.commit method id @internal 90, 20; 5898260 */
+static constexpr amqp_method_number_t AMQP_TX_COMMIT_METHOD =
+    ((amqp_method_number_t)0x005A0014); /**< tx.commit method id @internal 90,
+                                           20; 5898260 */
 /** tx.commit method fields */
 typedef struct amqp_tx_commit_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_commit_t;
 
-static constexpr amqp_method_number_t AMQP_TX_COMMIT_OK_METHOD = ((amqp_method_number_t)0x005A0015); /**< tx.commit-ok method id @internal 90, 21; 5898261 */
+static constexpr amqp_method_number_t AMQP_TX_COMMIT_OK_METHOD =
+    ((amqp_method_number_t)0x005A0015); /**< tx.commit-ok method id @internal
+                                           90, 21; 5898261 */
 /** tx.commit-ok method fields */
 typedef struct amqp_tx_commit_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_commit_ok_t;
 
-static constexpr amqp_method_number_t AMQP_TX_ROLLBACK_METHOD = ((amqp_method_number_t)0x005A001E); /**< tx.rollback method id @internal 90, 30; 5898270 */
+static constexpr amqp_method_number_t AMQP_TX_ROLLBACK_METHOD =
+    ((amqp_method_number_t)0x005A001E); /**< tx.rollback method id @internal 90,
+                                           30; 5898270 */
 /** tx.rollback method fields */
 typedef struct amqp_tx_rollback_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_rollback_t;
 
-static constexpr amqp_method_number_t AMQP_TX_ROLLBACK_OK_METHOD = ((amqp_method_number_t)0x005A001F); /**< tx.rollback-ok method id @internal 90, 31; 5898271 */
+static constexpr amqp_method_number_t AMQP_TX_ROLLBACK_OK_METHOD =
+    ((amqp_method_number_t)0x005A001F); /**< tx.rollback-ok method id @internal
+                                           90, 31; 5898271 */
 /** tx.rollback-ok method fields */
 typedef struct amqp_tx_rollback_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_tx_rollback_ok_t;
 
-static constexpr amqp_method_number_t AMQP_CONFIRM_SELECT_METHOD = ((amqp_method_number_t)0x0055000A); /**< confirm.select method id @internal 85, 10; 5570570 */
+static constexpr amqp_method_number_t AMQP_CONFIRM_SELECT_METHOD =
+    ((amqp_method_number_t)0x0055000A); /**< confirm.select method id @internal
+                                           85, 10; 5570570 */
 /** confirm.select method fields */
 typedef struct amqp_confirm_select_t_ {
   amqp_boolean_t nowait; /**< nowait */
 } amqp_confirm_select_t;
 
-static constexpr amqp_method_number_t AMQP_CONFIRM_SELECT_OK_METHOD = ((amqp_method_number_t)0x0055000B); /**< confirm.select-ok method id @internal 85, 11; 5570571 */
+static constexpr amqp_method_number_t AMQP_CONFIRM_SELECT_OK_METHOD =
+    ((amqp_method_number_t)0x0055000B); /**< confirm.select-ok method id
+                                           @internal 85, 11; 5570571 */
 /** confirm.select-ok method fields */
 typedef struct amqp_confirm_select_ok_t_ {
   char dummy; /**< Dummy field to avoid empty struct */
 } amqp_confirm_select_ok_t;
 
 /* Class property records. */
-static constexpr uint16_t AMQP_CONNECTION_CLASS = (0x000A); /**< connection class id @internal 10 */
+static constexpr uint16_t AMQP_CONNECTION_CLASS =
+    (0x000A); /**< connection class id @internal 10 */
 /** connection class properties */
 typedef struct amqp_connection_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_connection_properties_t;
 
-static constexpr uint16_t AMQP_CHANNEL_CLASS = (0x0014); /**< channel class id @internal 20 */
+static constexpr uint16_t AMQP_CHANNEL_CLASS =
+    (0x0014); /**< channel class id @internal 20 */
 /** channel class properties */
 typedef struct amqp_channel_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_channel_properties_t;
 
-static constexpr uint16_t AMQP_ACCESS_CLASS = (0x001E); /**< access class id @internal 30 */
+static constexpr uint16_t AMQP_ACCESS_CLASS =
+    (0x001E); /**< access class id @internal 30 */
 /** access class properties */
 typedef struct amqp_access_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_access_properties_t;
 
-static constexpr uint16_t AMQP_EXCHANGE_CLASS = (0x0028); /**< exchange class id @internal 40 */
+static constexpr uint16_t AMQP_EXCHANGE_CLASS =
+    (0x0028); /**< exchange class id @internal 40 */
 /** exchange class properties */
 typedef struct amqp_exchange_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_exchange_properties_t;
 
-static constexpr uint16_t AMQP_QUEUE_CLASS = (0x0032); /**< queue class id @internal 50 */
+static constexpr uint16_t AMQP_QUEUE_CLASS =
+    (0x0032); /**< queue class id @internal 50 */
 /** queue class properties */
 typedef struct amqp_queue_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_queue_properties_t;
 
-static constexpr uint16_t AMQP_BASIC_CLASS = (0x003C); /**< basic class id @internal 60 */
-static constexpr amqp_flags_t AMQP_BASIC_CONTENT_TYPE_FLAG = 0b1u << 15; /**< basic.content-type property flag */
-static constexpr amqp_flags_t AMQP_BASIC_CONTENT_ENCODING_FLAG = 0b1u << 14; /**< basic.content-encoding property flag */
-static constexpr amqp_flags_t AMQP_BASIC_HEADERS_FLAG = 0b1u << 13; /**< basic.headers property flag */
-static constexpr amqp_flags_t AMQP_BASIC_DELIVERY_MODE_FLAG = 0b1u << 12; /**< basic.delivery-mode property flag */
-static constexpr amqp_flags_t AMQP_BASIC_PRIORITY_FLAG = 0b1u << 11; /**< basic.priority property flag */
-static constexpr amqp_flags_t AMQP_BASIC_CORRELATION_ID_FLAG = 0b1u << 10; /**< basic.correlation-id property flag */
-static constexpr amqp_flags_t AMQP_BASIC_REPLY_TO_FLAG = 0b1u << 9; /**< basic.reply-to property flag */
-static constexpr amqp_flags_t AMQP_BASIC_EXPIRATION_FLAG = 0b1u << 8; /**< basic.expiration property flag */
-static constexpr amqp_flags_t AMQP_BASIC_MESSAGE_ID_FLAG = 0b1u << 7; /**< basic.message-id property flag */
-static constexpr amqp_flags_t AMQP_BASIC_TIMESTAMP_FLAG = 0b1u << 6; /**< basic.timestamp property flag */
-static constexpr amqp_flags_t AMQP_BASIC_TYPE_FLAG = 0b1u << 5; /**< basic.type property flag */
-static constexpr amqp_flags_t AMQP_BASIC_USER_ID_FLAG = 0b1u << 4; /**< basic.user-id property flag */
-static constexpr amqp_flags_t AMQP_BASIC_APP_ID_FLAG = 0b1u << 3; /**< basic.app-id property flag */
-static constexpr amqp_flags_t AMQP_BASIC_CLUSTER_ID_FLAG = 0b1u << 2; /**< basic.cluster-id property flag */
+static constexpr uint16_t AMQP_BASIC_CLASS =
+    (0x003C); /**< basic class id @internal 60 */
+static constexpr amqp_flags_t AMQP_BASIC_CONTENT_TYPE_FLAG =
+    0b1u << 15; /**< basic.content-type property flag */
+static constexpr amqp_flags_t AMQP_BASIC_CONTENT_ENCODING_FLAG =
+    0b1u << 14; /**< basic.content-encoding property flag */
+static constexpr amqp_flags_t AMQP_BASIC_HEADERS_FLAG =
+    0b1u << 13; /**< basic.headers property flag */
+static constexpr amqp_flags_t AMQP_BASIC_DELIVERY_MODE_FLAG =
+    0b1u << 12; /**< basic.delivery-mode property flag */
+static constexpr amqp_flags_t AMQP_BASIC_PRIORITY_FLAG =
+    0b1u << 11; /**< basic.priority property flag */
+static constexpr amqp_flags_t AMQP_BASIC_CORRELATION_ID_FLAG =
+    0b1u << 10; /**< basic.correlation-id property flag */
+static constexpr amqp_flags_t AMQP_BASIC_REPLY_TO_FLAG =
+    0b1u << 9; /**< basic.reply-to property flag */
+static constexpr amqp_flags_t AMQP_BASIC_EXPIRATION_FLAG =
+    0b1u << 8; /**< basic.expiration property flag */
+static constexpr amqp_flags_t AMQP_BASIC_MESSAGE_ID_FLAG =
+    0b1u << 7; /**< basic.message-id property flag */
+static constexpr amqp_flags_t AMQP_BASIC_TIMESTAMP_FLAG =
+    0b1u << 6; /**< basic.timestamp property flag */
+static constexpr amqp_flags_t AMQP_BASIC_TYPE_FLAG =
+    0b1u << 5; /**< basic.type property flag */
+static constexpr amqp_flags_t AMQP_BASIC_USER_ID_FLAG =
+    0b1u << 4; /**< basic.user-id property flag */
+static constexpr amqp_flags_t AMQP_BASIC_APP_ID_FLAG =
+    0b1u << 3; /**< basic.app-id property flag */
+static constexpr amqp_flags_t AMQP_BASIC_CLUSTER_ID_FLAG =
+    0b1u << 2; /**< basic.cluster-id property flag */
 /** basic class properties */
 typedef struct amqp_basic_properties_t_ {
   amqp_flags_t _flags;           /**< bit-mask of set fields */
@@ -713,14 +885,16 @@ typedef struct amqp_basic_properties_t_ {
   amqp_bytes_t cluster_id;       /**< cluster-id */
 } amqp_basic_properties_t;
 
-static constexpr uint16_t AMQP_TX_CLASS = (0x005A); /**< tx class id @internal 90 */
+static constexpr uint16_t AMQP_TX_CLASS =
+    (0x005A); /**< tx class id @internal 90 */
 /** tx class properties */
 typedef struct amqp_tx_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */
   char dummy;          /**< Dummy field to avoid empty struct */
 } amqp_tx_properties_t;
 
-static constexpr uint16_t AMQP_CONFIRM_CLASS = (0x0055); /**< confirm class id @internal 85 */
+static constexpr uint16_t AMQP_CONFIRM_CLASS =
+    (0x0055); /**< confirm class id @internal 85 */
 /** confirm class properties */
 typedef struct amqp_confirm_properties_t_ {
   amqp_flags_t _flags; /**< bit-mask of set fields */

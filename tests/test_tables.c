@@ -11,8 +11,7 @@
 
 #include "rabbitmq-c/amqp.h"
 
-static constexpr double amqp_pi =
-    3.14159265358979323846264338327950288;
+static constexpr double amqp_pi = 3.14159265358979323846264338327950288;
 
 void die(const char *fmt, ...) {
   va_list ap;
