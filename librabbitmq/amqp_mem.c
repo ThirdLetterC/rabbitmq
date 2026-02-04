@@ -5,13 +5,14 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+
+#include "rabbitmq-c/amqp_private.h"
 
 char const *amqp_version() { return AMQP_VERSION_STRING; }
 

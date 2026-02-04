@@ -5,14 +5,16 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
-#include "amqp_time.h"
-#include "rabbitmq-c/tcp_socket.h"
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq-c/tcp_socket.h"
 
 static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE = 65'536;
 static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE = 131'072;

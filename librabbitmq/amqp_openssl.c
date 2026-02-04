@@ -8,14 +8,6 @@
 // Use OpenSSL v1.1.1 API.
 #define OPENSSL_API_COMPAT 10101
 
-#include "amqp_openssl_bio.h"
-#include "amqp_private.h"
-#include "amqp_socket.h"
-#include "amqp_time.h"
-#include "rabbitmq-c/ssl_socket.h"
-#include "threads.h"
-
-#include <ctype.h>
 #include <limits.h>
 #include <openssl/bio.h>
 #include <openssl/conf.h>
@@ -28,6 +20,12 @@
 #include <openssl/x509v3.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_openssl_bio.h"
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq-c/ssl_socket.h"
 
 static int initialize_ssl_and_increment_connections();
 static int decrement_ssl_connections();

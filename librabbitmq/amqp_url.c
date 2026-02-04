@@ -5,12 +5,13 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_private.h"
 
 void amqp_default_connection_info(struct amqp_connection_info *ci) {
   /* Apply defaults */

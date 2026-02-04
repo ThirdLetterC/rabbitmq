@@ -1,7 +1,9 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +11,7 @@
 
 #include <inttypes.h>
 
-#include <rabbitmq-c/amqp.h>
+#include "rabbitmq-c/amqp.h"
 
 static void match_string(const char *what, const char *expect,
                          const char *got) {

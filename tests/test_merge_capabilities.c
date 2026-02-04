@@ -1,11 +1,12 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "amqp_socket.h"
-#include "amqp_table.h"
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp_table.h"
 
 static int compare_bytes(amqp_bytes_t l, amqp_bytes_t r);
 static int compare_amqp_table_entry(amqp_table_entry_t result,

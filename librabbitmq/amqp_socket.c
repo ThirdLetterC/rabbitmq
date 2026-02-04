@@ -5,11 +5,6 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
-#include "amqp_socket.h"
-#include "amqp_table.h"
-#include "amqp_time.h"
-
 #include <assert.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -34,6 +29,11 @@
 #include <poll.h>
 #endif
 #include <unistd.h>
+
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp_table.h"
+#include "rabbitmq-c/amqp_time.h"
 
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
                                  amqp_method_number_t *list);

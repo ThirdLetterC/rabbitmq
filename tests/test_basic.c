@@ -1,19 +1,18 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "amqp_time.h"
-#include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/tcp_socket.h>
-
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <sys/time.h>
+
+#include "rabbitmq-c/amqp.h"
+#include "rabbitmq-c/tcp_socket.h"
+#include "rabbitmq-c/amqp_time.h"
 
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
+
 #include <assert.h>
 
 static const int fixed_channel_id = 1;

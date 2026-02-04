@@ -236,7 +236,6 @@ pub fn build(b: *std.Build) void {
             },
             .flags = cflags[0..],
         });
-        tools_common.linkSystemLibrary("popt");
         if (use_static) {
             tools_common.root_module.addCMacro("AMQP_STATIC", "1");
         }

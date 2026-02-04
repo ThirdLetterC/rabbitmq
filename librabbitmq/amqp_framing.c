@@ -7,11 +7,12 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_private.h"
 
 char const *amqp_constant_name(int constantNumber) {
   switch (constantNumber) {

@@ -9,9 +9,10 @@
 
 #include <inttypes.h>
 
-#include <rabbitmq-c/amqp.h>
+#include "rabbitmq-c/amqp.h"
 
-#include <math.h>
+static constexpr double amqp_pi =
+    3.14159265358979323846264338327950288;
 
 void die(const char *fmt, ...) {
   va_list ap;
@@ -286,11 +287,11 @@ static void test_table_codec(FILE *out) {
 
   entries[12].key = amqp_literal_bytes("float");
   entries[12].value.kind = AMQP_FIELD_KIND_F32;
-  entries[12].value.value.f32 = (float)M_PI;
+  entries[12].value.value.f32 = (float)amqp_pi;
 
   entries[13].key = amqp_literal_bytes("double");
   entries[13].value.kind = AMQP_FIELD_KIND_F64;
-  entries[13].value.value.f64 = M_PI;
+  entries[13].value.value.f64 = amqp_pi;
 
   table.num_entries = 14;
   table.entries = entries;

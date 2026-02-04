@@ -5,15 +5,18 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
-#include "rabbitmq-c/tcp_socket.h"
+#include <asm-generic/errno-base.h>
+#include <asm-generic/errno.h>
 
-#include <errno.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/tcp_socket.h"
 
 struct amqp_tcp_socket_t {
   const struct amqp_socket_class_t *klass;

@@ -1,11 +1,11 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "amqp_time.h"
-#include "rabbitmq-c/amqp.h"
 #include <assert.h>
 #include <limits.h>
-#include <string.h>
+
+#include "rabbitmq-c/amqp.h"
+#include "rabbitmq-c/amqp_time.h"
 
 #if (defined(machintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
 #define AMQP_MAC_TIMER_API

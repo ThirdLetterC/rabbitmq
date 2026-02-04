@@ -1,13 +1,14 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "amqp_openssl_bio.h"
-#include "amqp_socket.h"
-
 #include <assert.h>
-#include <errno.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+#include <openssl/bio.h>
+
+#include "rabbitmq-c/amqp_openssl_bio.h"
+#include "rabbitmq-c/amqp_socket.h"
 
 #ifdef MSG_NOSIGNAL
 #define AMQP_USE_AMQP_BIO
@@ -21,7 +22,7 @@ static BIO_METHOD *amqp_bio_method;
 
 static int amqp_openssl_bio_should_retry(int res) {
   if (res == -1) {
-    int err = amqp_os_socket_error();
+    [[maybe_unused]] int err = amqp_os_socket_error();
     if (
 #ifdef EWOULDBLOCK
         err == EWOULDBLOCK ||

@@ -13,7 +13,6 @@ static constexpr char AMQ_COPYRIGHT[] =
     " and Alan Antonuk.";
 
 #include "rabbitmq-c/amqp.h"
-#include "rabbitmq-c/framing.h"
 #include <string.h>
 
 #include <arpa/inet.h>
@@ -21,7 +20,6 @@ static constexpr char AMQ_COPYRIGHT[] =
 
 char *amqp_os_error_string(int err);
 
-#include "amqp_socket.h"
 #include "amqp_time.h"
 
 /*

@@ -5,13 +5,14 @@
 #include "config.h"
 #endif
 
-#include "amqp_private.h"
-#include "amqp_table.h"
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_table.h"
 
 static constexpr int initial_array_size = 16;
 static constexpr int initial_table_size = 16;

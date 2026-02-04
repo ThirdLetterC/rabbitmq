@@ -5,3 +5,4 @@
 -Werror
 -Iinclude
 -Iexamples
+-Ilibrabbitmq

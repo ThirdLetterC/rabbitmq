@@ -1,12 +1,12 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "amqp_private.h"
-#include "amqp_socket.h"
-#include "rabbitmq-c/amqp.h"
-
 #include <stdlib.h>
 #include <string.h>
+
+#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq-c/amqp.h"
 
 static int amqp_basic_properties_clone(amqp_basic_properties_t *original,
                                        amqp_basic_properties_t *clone,
