@@ -1,6 +1,10 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -34,8 +38,6 @@
 #include "rabbitmq-c/amqp_socket.h"
 #include "rabbitmq-c/amqp_table.h"
 #include "rabbitmq-c/amqp_time.h"
-
-struct addrinfo;
 
 constexpr char AMQ_PLATFORM[] = "unknown";
 
