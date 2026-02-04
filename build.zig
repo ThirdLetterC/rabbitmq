@@ -1,0 +1,328 @@
+const std = @import("std");
+
+fn addCommonSettings(
+    step: *std.Build.Step.Compile,
+    b: *std.Build,
+    target: std.Build.ResolvedTarget,
+    enable_ssl: bool,
+    amq_platform_define: []const u8,
+) void {
+    step.addIncludePath(b.path("include"));
+    step.addIncludePath(b.path("librabbitmq"));
+    if (enable_ssl) {
+        step.addIncludePath(b.path("librabbitmq/unix"));
+    }
+
+    switch (target.result.os.tag) {
+        .windows => step.root_module.addCMacro("HAVE_SELECT", "1"),
+        else => {
+            step.root_module.addCMacro("HAVE_POLL", "1");
+            step.root_module.addCMacro("_POSIX_C_SOURCE", "200809L");
+        },
+    }
+
+    step.root_module.addCMacro("AMQ_PLATFORM", amq_platform_define);
+    step.linkLibC();
+}
+
+fn linkPlatformLibs(step: *std.Build.Step.Compile, target: std.Build.ResolvedTarget) void {
+    switch (target.result.os.tag) {
+        .windows => {
+            step.linkSystemLibrary("ws2_32");
+            step.linkSystemLibrary("iphlpapi");
+        },
+        .linux => {
+            step.linkSystemLibrary("pthread");
+            step.linkSystemLibrary("rt");
+        },
+        else => {
+            step.linkSystemLibrary("pthread");
+        },
+    }
+}
+
+fn addRabbitmqSources(
+    step: *std.Build.Step.Compile,
+    enable_ssl: bool,
+    cflags: []const []const u8,
+) void {
+    const base_sources = [_][]const u8{
+        "librabbitmq/amqp_api.c",
+        "librabbitmq/amqp_connection.c",
+        "librabbitmq/amqp_consumer.c",
+        "librabbitmq/amqp_framing.c",
+        "librabbitmq/amqp_mem.c",
+        "librabbitmq/amqp_socket.c",
+        "librabbitmq/amqp_table.c",
+        "librabbitmq/amqp_tcp_socket.c",
+        "librabbitmq/amqp_time.c",
+        "librabbitmq/amqp_url.c",
+    };
+
+    step.addCSourceFiles(.{
+        .files = base_sources[0..],
+        .flags = cflags,
+    });
+
+    if (enable_ssl) {
+        const ssl_sources = [_][]const u8{
+            "librabbitmq/amqp_openssl.c",
+            "librabbitmq/amqp_openssl_bio.c",
+        };
+        step.addCSourceFiles(.{
+            .files = ssl_sources[0..],
+            .flags = cflags,
+        });
+    }
+}
+
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const enable_ssl = b.option(bool, "ssl", "Enable OpenSSL support") orelse false;
+    const build_shared = b.option(bool, "shared", "Build shared library") orelse true;
+    const build_static = b.option(bool, "static", "Build static library") orelse true;
+    const build_examples = b.option(bool, "examples", "Build examples") orelse true;
+    const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse false;
+    const build_tests = b.option(bool, "tests", "Build tests") orelse false;
+
+    if (!build_shared and !build_static) {
+        @panic("At least one of -Dshared or -Dstatic must be true");
+    }
+
+    const amq_platform_define = b.fmt("\"{s}-{s}\"", .{
+        @tagName(target.result.cpu.arch),
+        @tagName(target.result.os.tag),
+    });
+
+    const cflags = [_][]const u8{
+        "-std=c23",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Werror",
+    };
+
+    const mk_module = struct {
+        fn create(bld: *std.Build, tgt: std.Build.ResolvedTarget, opt: std.builtin.OptimizeMode) *std.Build.Module {
+            return bld.createModule(.{
+                .target = tgt,
+                .optimize = opt,
+                .link_libc = true,
+            });
+        }
+    }.create;
+
+    var shared_lib: ?*std.Build.Step.Compile = null;
+    var static_lib: ?*std.Build.Step.Compile = null;
+
+    if (build_shared) {
+        const lib = b.addLibrary(.{
+            .name = "rabbitmq",
+            .root_module = mk_module(b, target, optimize),
+            .linkage = .dynamic,
+        });
+        addCommonSettings(lib, b, target, enable_ssl, amq_platform_define);
+        addRabbitmqSources(lib, enable_ssl, cflags[0..]);
+        lib.root_module.addCMacro("AMQP_EXPORTS", "1");
+        linkPlatformLibs(lib, target);
+        if (enable_ssl) {
+            lib.linkSystemLibrary("ssl");
+            lib.linkSystemLibrary("crypto");
+        }
+        b.installArtifact(lib);
+        shared_lib = lib;
+    }
+
+    if (build_static) {
+        const lib = b.addLibrary(.{
+            .name = "rabbitmq",
+            .root_module = mk_module(b, target, optimize),
+            .linkage = .static,
+        });
+        addCommonSettings(lib, b, target, enable_ssl, amq_platform_define);
+        addRabbitmqSources(lib, enable_ssl, cflags[0..]);
+        lib.root_module.addCMacro("AMQP_STATIC", "1");
+        linkPlatformLibs(lib, target);
+        if (enable_ssl) {
+            lib.linkSystemLibrary("ssl");
+            lib.linkSystemLibrary("crypto");
+        }
+        b.installArtifact(lib);
+        static_lib = lib;
+    }
+
+    const link_lib = if (shared_lib) |lib| lib else static_lib.?;
+    const use_static = shared_lib == null;
+
+    if (build_examples) {
+        const examples_common = b.addLibrary(.{
+            .name = "examples-common",
+            .root_module = mk_module(b, target, optimize),
+            .linkage = .static,
+        });
+        examples_common.addIncludePath(b.path("examples"));
+        addCommonSettings(examples_common, b, target, enable_ssl, amq_platform_define);
+        examples_common.addCSourceFiles(.{
+            .files = &.{
+                "examples/utils.c",
+                "examples/unix/platform_utils.c",
+            },
+            .flags = cflags[0..],
+        });
+        if (use_static) {
+            examples_common.root_module.addCMacro("AMQP_STATIC", "1");
+        }
+
+        const examples = [_]struct {
+            name: []const u8,
+            file: []const u8,
+            requires_ssl: bool,
+        }{
+            .{ .name = "amqp_sendstring", .file = "examples/amqp_sendstring.c", .requires_ssl = false },
+            .{ .name = "amqp_rpc_sendstring_client", .file = "examples/amqp_rpc_sendstring_client.c", .requires_ssl = false },
+            .{ .name = "amqp_exchange_declare", .file = "examples/amqp_exchange_declare.c", .requires_ssl = false },
+            .{ .name = "amqp_listen", .file = "examples/amqp_listen.c", .requires_ssl = false },
+            .{ .name = "amqp_producer", .file = "examples/amqp_producer.c", .requires_ssl = false },
+            .{ .name = "amqp_confirm_select", .file = "examples/amqp_confirm_select.c", .requires_ssl = false },
+            .{ .name = "amqp_connect_timeout", .file = "examples/amqp_connect_timeout.c", .requires_ssl = false },
+            .{ .name = "amqp_consumer", .file = "examples/amqp_consumer.c", .requires_ssl = false },
+            .{ .name = "amqp_unbind", .file = "examples/amqp_unbind.c", .requires_ssl = false },
+            .{ .name = "amqp_bind", .file = "examples/amqp_bind.c", .requires_ssl = false },
+            .{ .name = "amqp_listenq", .file = "examples/amqp_listenq.c", .requires_ssl = false },
+            .{ .name = "amqp_ssl_connect", .file = "examples/amqp_ssl_connect.c", .requires_ssl = true },
+        };
+
+        for (examples) |ex| {
+            if (ex.requires_ssl and !enable_ssl) continue;
+
+            const exe = b.addExecutable(.{
+                .name = ex.name,
+                .root_module = mk_module(b, target, optimize),
+            });
+            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            exe.addIncludePath(b.path("examples"));
+            exe.addCSourceFiles(.{
+                .files = &.{ex.file},
+                .flags = cflags[0..],
+            });
+            if (use_static) {
+                exe.root_module.addCMacro("AMQP_STATIC", "1");
+            }
+            exe.linkLibrary(examples_common);
+            exe.linkLibrary(link_lib);
+            linkPlatformLibs(exe, target);
+            if (enable_ssl) {
+                exe.linkSystemLibrary("ssl");
+                exe.linkSystemLibrary("crypto");
+            }
+            b.installArtifact(exe);
+        }
+    }
+
+    if (build_tools) {
+        const tools_common = b.addLibrary(.{
+            .name = "tools-common",
+            .root_module = mk_module(b, target, optimize),
+            .linkage = .static,
+        });
+        tools_common.addIncludePath(b.path("tools"));
+        tools_common.addIncludePath(b.path("tools/unix"));
+        addCommonSettings(tools_common, b, target, enable_ssl, amq_platform_define);
+        tools_common.addCSourceFiles(.{
+            .files = &.{
+                "tools/common.c",
+            },
+            .flags = cflags[0..],
+        });
+        tools_common.linkSystemLibrary("popt");
+        if (use_static) {
+            tools_common.root_module.addCMacro("AMQP_STATIC", "1");
+        }
+        if (enable_ssl) {
+            tools_common.root_module.addCMacro("WITH_SSL", "1");
+        }
+
+        const tools = [_]struct {
+            name: []const u8,
+            file: []const u8,
+        }{
+            .{ .name = "amqp-publish", .file = "tools/publish.c" },
+            .{ .name = "amqp-get", .file = "tools/get.c" },
+            .{ .name = "amqp-consume", .file = "tools/consume.c" },
+            .{ .name = "amqp-declare-queue", .file = "tools/declare_queue.c" },
+            .{ .name = "amqp-delete-queue", .file = "tools/delete_queue.c" },
+        };
+
+        for (tools) |tool| {
+            const exe = b.addExecutable(.{
+                .name = tool.name,
+                .root_module = mk_module(b, target, optimize),
+            });
+            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            exe.addIncludePath(b.path("tools"));
+            exe.addIncludePath(b.path("tools/unix"));
+            exe.addCSourceFiles(.{
+                .files = if (std.mem.eql(u8, tool.name, "amqp-consume"))
+                    &.{
+                        "tools/consume.c",
+                        "tools/unix/process.c",
+                    }
+                else
+                    &.{tool.file},
+                .flags = cflags[0..],
+            });
+            if (use_static) {
+                exe.root_module.addCMacro("AMQP_STATIC", "1");
+            }
+            if (enable_ssl) {
+                exe.root_module.addCMacro("WITH_SSL", "1");
+                exe.linkSystemLibrary("ssl");
+                exe.linkSystemLibrary("crypto");
+            }
+            exe.linkSystemLibrary("popt");
+            exe.linkLibrary(tools_common);
+            exe.linkLibrary(link_lib);
+            linkPlatformLibs(exe, target);
+            b.installArtifact(exe);
+        }
+    }
+
+    if (build_tests) {
+        const tests = [_]struct {
+            name: []const u8,
+            file: []const u8,
+        }{
+            .{ .name = "test_parse_url", .file = "tests/test_parse_url.c" },
+            .{ .name = "test_tables", .file = "tests/test_tables.c" },
+            .{ .name = "test_status_enum", .file = "tests/test_status_enum.c" },
+            .{ .name = "test_basic", .file = "tests/test_basic.c" },
+            .{ .name = "test_sasl_mechanism", .file = "tests/test_sasl_mechanism.c" },
+            .{ .name = "test_merge_capabilities", .file = "tests/test_merge_capabilities.c" },
+        };
+
+        for (tests) |test_bin| {
+            const exe = b.addExecutable(.{
+                .name = test_bin.name,
+                .root_module = mk_module(b, target, optimize),
+            });
+            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            exe.addIncludePath(b.path("tests"));
+            exe.addCSourceFiles(.{
+                .files = &.{test_bin.file},
+                .flags = cflags[0..],
+            });
+            if (use_static) {
+                exe.root_module.addCMacro("AMQP_STATIC", "1");
+            }
+            exe.linkLibrary(link_lib);
+            linkPlatformLibs(exe, target);
+            if (enable_ssl) {
+                exe.linkSystemLibrary("ssl");
+                exe.linkSystemLibrary("crypto");
+            }
+            b.installArtifact(exe);
+        }
+    }
+}

@@ -409,8 +409,9 @@ int amqp_ssl_socket_set_key(amqp_socket_t *base, const char *cert,
   return AMQP_STATUS_OK;
 }
 
-int amqp_ssl_socket_set_key_engine(amqp_socket_t *base, const char *cert,
-                                   const char *key) {
+int amqp_ssl_socket_set_key_engine([[maybe_unused]] amqp_socket_t *base,
+                                   [[maybe_unused]] const char *cert,
+                                   [[maybe_unused]] const char *key) {
 #ifdef ENABLE_SSL_ENGINE_API
   int status;
   struct amqp_ssl_socket_t *self;
@@ -593,7 +594,7 @@ void amqp_set_initialize_ssl_library(amqp_boolean_t do_initialize) {
 
 int amqp_initialize_ssl_library() { return AMQP_STATUS_OK; }
 
-int amqp_set_ssl_engine(const char *engine) {
+int amqp_set_ssl_engine([[maybe_unused]] const char *engine) {
 #ifdef ENABLE_SSL_ENGINE_API
   int status = AMQP_STATUS_OK;
   CHECK_SUCCESS(pthread_mutex_lock(&openssl_init_mutex));

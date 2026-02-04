@@ -145,8 +145,7 @@ int amqp_get_heartbeat(amqp_connection_state_t state) {
 int amqp_destroy_connection(amqp_connection_state_t state) {
   int status = AMQP_STATUS_OK;
   if (state) {
-    int i;
-    for (i = 0; i < POOL_TABLE_SIZE; ++i) {
+    for (size_t i = 0; i < POOL_TABLE_SIZE; ++i) {
       amqp_pool_table_entry_t *entry = state->pool_table[i];
       while (nullptr != entry) {
         amqp_pool_table_entry_t *todelete = entry;
@@ -372,10 +371,9 @@ amqp_boolean_t amqp_release_buffers_ok(amqp_connection_state_t state) {
 }
 
 void amqp_release_buffers(amqp_connection_state_t state) {
-  int i;
   ENFORCE_STATE(state, CONNECTION_STATE_IDLE);
 
-  for (i = 0; i < POOL_TABLE_SIZE; ++i) {
+  for (size_t i = 0; i < POOL_TABLE_SIZE; ++i) {
     amqp_pool_table_entry_t *entry = state->pool_table[i];
 
     for (; nullptr != entry; entry = entry->next) {

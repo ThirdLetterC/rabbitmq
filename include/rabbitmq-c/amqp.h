@@ -106,9 +106,8 @@ static constexpr uint8_t AMQP_VERSION_IS_RELEASE = 0;
  *
  * \since v0.6.1
  */
-static constexpr uint32_t AMQP_VERSION_CODE(uint32_t major, uint32_t minor,
-                                            uint32_t patch,
-                                            uint32_t release) {
+static inline uint32_t AMQP_VERSION_CODE(uint32_t major, uint32_t minor,
+                                         uint32_t patch, uint32_t release) {
   return (major << 24u) | (minor << 16u) | (patch << 8u) | release;
 }
 
@@ -131,8 +130,8 @@ static constexpr uint32_t AMQP_VERSION_CODE(uint32_t major, uint32_t minor,
  * \since v0.4.0
  */
 static constexpr uint32_t AMQP_VERSION =
-    AMQP_VERSION_CODE(AMQP_VERSION_MAJOR, AMQP_VERSION_MINOR,
-                      AMQP_VERSION_PATCH, AMQP_VERSION_IS_RELEASE);
+    (AMQP_VERSION_MAJOR << 24u) | (AMQP_VERSION_MINOR << 16u) |
+    (AMQP_VERSION_PATCH << 8u) | AMQP_VERSION_IS_RELEASE;
 
 /**
  * \def AMQP_VERSION_STRING

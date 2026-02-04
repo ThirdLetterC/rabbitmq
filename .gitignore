@@ -75,3 +75,6 @@ tools/doc/man-date.ent
 .cache/
 compile_commands.json
 codegen/
+
+.zig-cache
+zig-out
