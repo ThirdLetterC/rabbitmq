@@ -39,7 +39,13 @@
 #include "rabbitmq-c/amqp_table.h"
 #include "rabbitmq-c/amqp_time.h"
 
-constexpr char AMQ_PLATFORM[] = "unknown";
+static constexpr char amqp_platform[] =
+#ifdef AMQ_PLATFORM
+    AMQ_PLATFORM
+#else
+    "unknown"
+#endif
+    ;
 
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
                                  amqp_method_number_t *list);
@@ -1204,7 +1210,7 @@ static amqp_rpc_reply_t amqp_login_inner(amqp_connection_state_t state,
     default_properties[1] =
         amqp_table_construct_utf8_entry("version", AMQP_VERSION_STRING);
     default_properties[2] =
-        amqp_table_construct_utf8_entry("platform", AMQ_PLATFORM);
+        amqp_table_construct_utf8_entry("platform", amqp_platform);
     default_properties[3] =
         amqp_table_construct_utf8_entry("copyright", AMQ_COPYRIGHT);
     default_properties[4] = amqp_table_construct_utf8_entry(
