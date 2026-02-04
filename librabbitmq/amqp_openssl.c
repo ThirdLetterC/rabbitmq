@@ -29,11 +29,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int initialize_ssl_and_increment_connections(void);
-static int decrement_ssl_connections(void);
+static int initialize_ssl_and_increment_connections();
+static int decrement_ssl_connections();
 
 static pthread_mutex_t openssl_init_mutex = PTHREAD_MUTEX_INITIALIZER;
-static amqp_boolean_t openssl_bio_initialized = 0;
+static amqp_boolean_t openssl_bio_initialized = false;
 static int openssl_connections = 0;
 #ifdef ENABLE_SSL_ENGINE_API
 static ENGINE *openssl_engine = nullptr;
@@ -591,7 +591,7 @@ void amqp_set_initialize_ssl_library(amqp_boolean_t do_initialize) {
   return;
 }
 
-int amqp_initialize_ssl_library(void) { return AMQP_STATUS_OK; }
+int amqp_initialize_ssl_library() { return AMQP_STATUS_OK; }
 
 int amqp_set_ssl_engine(const char *engine) {
 #ifdef ENABLE_SSL_ENGINE_API
@@ -629,7 +629,7 @@ out:
 #endif
 }
 
-static int initialize_ssl_and_increment_connections(void) {
+static int initialize_ssl_and_increment_connections() {
   int status;
   CHECK_SUCCESS(pthread_mutex_lock(&openssl_init_mutex));
 
@@ -648,7 +648,7 @@ exit:
   return status;
 }
 
-static int decrement_ssl_connections(void) {
+static int decrement_ssl_connections() {
   CHECK_SUCCESS(pthread_mutex_lock(&openssl_init_mutex));
 
   if (openssl_connections > 0) {
@@ -664,4 +664,4 @@ static int decrement_ssl_connections(void) {
   return AMQP_STATUS_OK;
 }
 
-int amqp_uninitialize_ssl_library(void) { return AMQP_STATUS_OK; }
+int amqp_uninitialize_ssl_library() { return AMQP_STATUS_OK; }

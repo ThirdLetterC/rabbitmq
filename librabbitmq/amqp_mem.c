@@ -13,12 +13,12 @@
 #include <string.h>
 #include <sys/types.h>
 
-char const *amqp_version(void) { return AMQP_VERSION_STRING; }
+char const *amqp_version() { return AMQP_VERSION_STRING; }
 
-uint32_t amqp_version_number(void) { return AMQP_VERSION; }
+uint32_t amqp_version_number() { return AMQP_VERSION; }
 
 void init_amqp_pool(amqp_pool_t *pool, size_t pagesize) {
-  pool->pagesize = pagesize ? pagesize : 4096;
+  pool->pagesize = pagesize ? pagesize : 4'096;
 
   pool->pages.num_blocks = 0;
   pool->pages.blocklist = nullptr;
@@ -61,7 +61,7 @@ static int record_pool_block(amqp_pool_blocklist_t *x, void *block) {
   size_t blocklistlength = sizeof(void *) * (x->num_blocks + 1);
 
   if (x->blocklist == nullptr) {
-    x->blocklist = malloc(blocklistlength);
+    x->blocklist = calloc(1, blocklistlength);
     if (x->blocklist == nullptr) {
       return 0;
     }
@@ -142,7 +142,7 @@ amqp_bytes_t amqp_cstring_bytes(char const *cstr) {
 amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
   amqp_bytes_t result;
   result.len = src.len;
-  result.bytes = malloc(src.len);
+  result.bytes = calloc(1, src.len);
   if (result.bytes != nullptr) {
     memcpy(result.bytes, src.bytes, src.len);
   }
@@ -152,7 +152,7 @@ amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
 amqp_bytes_t amqp_bytes_malloc(size_t amount) {
   amqp_bytes_t result;
   result.len = amount;
-  result.bytes = malloc(amount); /* will return nullptr if it fails */
+  result.bytes = calloc(1, amount); /* will return nullptr if it fails */
   return result;
 }
 
@@ -171,7 +171,7 @@ amqp_pool_t *amqp_get_or_create_channel_pool(amqp_connection_state_t state,
     }
   }
 
-  entry = malloc(sizeof(amqp_pool_table_entry_t));
+  entry = calloc(1, sizeof(amqp_pool_table_entry_t));
   if (nullptr == entry) {
     return nullptr;
   }

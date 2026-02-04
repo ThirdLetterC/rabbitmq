@@ -78,6 +78,47 @@ class BitEncoder(object):
             self.flush()
 
 
+def format_decimal_literal(value):
+    if not re.fullmatch(r"\\d+", value):
+        return value
+    if len(value) <= 3:
+        return value
+    groups = []
+    while value:
+        groups.append(value[-3:])
+        value = value[:-3]
+    return "'".join(reversed(groups))
+
+
+def framing_constant_type(name):
+    frame_small = {
+        "AMQP_FRAME_METHOD",
+        "AMQP_FRAME_HEADER",
+        "AMQP_FRAME_BODY",
+        "AMQP_FRAME_HEARTBEAT",
+        "AMQP_FRAME_END",
+    }
+    if name.startswith("AMQP_PROTOCOL_VERSION_"):
+        return "uint8_t"
+    if name == "AMQP_PROTOCOL_PORT":
+        return "uint16_t"
+    if name in frame_small:
+        return "uint8_t"
+    if name == "AMQP_FRAME_MIN_SIZE":
+        return "uint32_t"
+    if name.startswith("AMQP_FRAME_"):
+        return "uint16_t"
+    if name.endswith("_METHOD"):
+        return "amqp_method_number_t"
+    if name.endswith("_CLASS"):
+        return "uint16_t"
+    if name.endswith("_FLAG"):
+        return "amqp_flags_t"
+    if name.startswith("AMQP_"):
+        return "uint16_t"
+    return "uint32_t"
+
+
 class SimpleType(object):
     """A AMQP type that corresponds to a simple scalar C value of a
     certain width."""
@@ -514,13 +555,16 @@ def genHrl(spec):
 
 AMQP_BEGIN_DECLS
 """)
-    print("#define AMQP_PROTOCOL_VERSION_MAJOR %d     /**< AMQP protocol version major */" % (spec.major))
-    print("#define AMQP_PROTOCOL_VERSION_MINOR %d     /**< AMQP protocol version minor */" % (spec.minor))
-    print("#define AMQP_PROTOCOL_VERSION_REVISION %d  /**< AMQP protocol version revision */" % (spec.revision))
-    print("#define AMQP_PROTOCOL_PORT %d              /**< Default AMQP Port */" % (spec.port))
+    print("static constexpr uint8_t AMQP_PROTOCOL_VERSION_MAJOR = %s; /**< AMQP protocol version major */" % (format_decimal_literal(str(spec.major))))
+    print("static constexpr uint8_t AMQP_PROTOCOL_VERSION_MINOR = %s; /**< AMQP protocol version minor */" % (format_decimal_literal(str(spec.minor))))
+    print("static constexpr uint8_t AMQP_PROTOCOL_VERSION_REVISION = %s; /**< AMQP protocol version revision */" % (format_decimal_literal(str(spec.revision))))
+    print("static constexpr uint16_t AMQP_PROTOCOL_PORT = %s; /**< Default AMQP Port */" % (format_decimal_literal(str(spec.port))))
 
     for (c,v,cls) in spec.constants:
-        print("#define %s %s  /**< Constant: %s */" % (cConstantName(c), v, c))
+        name = cConstantName(c)
+        literal = format_decimal_literal(str(v))
+        ctype = framing_constant_type(name)
+        print("static constexpr %s %s = %s; /**< Constant: %s */" % (ctype, name, literal, c))
     print("")
 
     print("""/* Function prototypes. */
@@ -641,7 +685,7 @@ AMQP_CALL amqp_encode_properties(uint16_t class_id,
     print("/* Method field records. */\n")
     for m in methods:
         methodid = m.klass.index << 16 | m.index
-        print("#define %s ((amqp_method_number_t) 0x%.08X) /**< %s.%s method id @internal %d, %d; %d */" % \
+        print("static constexpr amqp_method_number_t %s = ((amqp_method_number_t)0x%.08X); /**< %s.%s method id @internal %d, %d; %d */" % \
               (m.defName(),
                methodid,
                m.klass.name,
@@ -654,7 +698,7 @@ AMQP_CALL amqp_encode_properties(uint16_t class_id,
 
     print("/* Class property records. */")
     for c in spec.allClasses():
-        print("#define %s (0x%.04X) /**< %s class id @internal %d */" % \
+        print("static constexpr uint16_t %s = 0x%.04X; /**< %s class id @internal %d */" % \
               (cConstantName(c.name + "_class"), c.index, c.name, c.index))
         index = 0
         for f in c.fields:
@@ -663,7 +707,7 @@ AMQP_CALL amqp_encode_properties(uint16_t class_id,
             shortnum = index // 16
             partialindex = 15 - (index % 16)
             bitindex = shortnum * 16 + partialindex
-            print('#define %s (1 << %d) /**< %s.%s property flag */' % (cFlagName(c, f), bitindex, c.name, f.name))
+            print('static constexpr amqp_flags_t %s = 0b1u << %d; /**< %s.%s property flag */' % (cFlagName(c, f), bitindex, c.name, f.name))
             index = index + 1
         print("/** %s class properties */\ntypedef struct %s_ {\n  amqp_flags_t _flags; /**< bit-mask of set fields */\n%s} %s;\n" % \
               (c.name,

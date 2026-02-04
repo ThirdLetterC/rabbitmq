@@ -92,7 +92,7 @@ static int amqp_openssl_bio_read(BIO *b, char *out, int outl) {
 }
 #endif /* AMQP_USE_AMQP_BIO */
 
-int amqp_openssl_bio_init(void) {
+int amqp_openssl_bio_init() {
   assert(!amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
   if (!(amqp_bio_method = BIO_meth_new(BIO_TYPE_SOCKET, "amqp_bio_method"))) {
@@ -126,7 +126,7 @@ int amqp_openssl_bio_init(void) {
   return AMQP_STATUS_OK;
 }
 
-void amqp_openssl_bio_destroy(void) {
+void amqp_openssl_bio_destroy() {
   assert(amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
   BIO_meth_free(amqp_bio_method);
@@ -135,7 +135,7 @@ void amqp_openssl_bio_destroy(void) {
   amqp_ssl_bio_initialized = 0;
 }
 
-BIO_METHOD_PTR amqp_openssl_bio(void) {
+BIO_METHOD_PTR amqp_openssl_bio() {
   assert(amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
   return amqp_bio_method;

@@ -30,7 +30,7 @@ typedef struct amqp_time_t_ {
 /* Gets a monotonic timestamp. This will return 0 if the underlying call to the
  * system fails.
  */
-uint64_t amqp_get_monotonic_timestamp(void);
+uint64_t amqp_get_monotonic_timestamp();
 
 /* Get a amqp_time_t that is timeout from now.
  * If timeout is nullptr, an amqp_time_infinite() is created.
@@ -52,7 +52,7 @@ int amqp_time_from_now(amqp_time_t *time, const struct timeval *timeout);
 int amqp_time_s_from_now(amqp_time_t *time, int seconds);
 
 /* Create an infinite amqp_time_t */
-amqp_time_t amqp_time_infinite(void);
+amqp_time_t amqp_time_infinite();
 
 /* Gets the number of ms until the amqp_time_t, suitable for the timeout
  * parameter in poll().

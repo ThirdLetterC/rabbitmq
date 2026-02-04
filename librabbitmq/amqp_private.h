@@ -172,7 +172,7 @@ static inline void *amqp_offset(void *data, size_t offset) {
     return 0;                                                                \
   }
 
-static inline int is_bigendian(void) {
+static inline int is_bigendian() {
   union {
     uint32_t i;
     char c[4];

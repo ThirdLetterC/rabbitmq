@@ -16,7 +16,7 @@
 #ifdef AMQP_MAC_TIMER_API
 #include <mach/mach_time.h>
 
-uint64_t amqp_get_monotonic_timestamp(void) {
+uint64_t amqp_get_monotonic_timestamp() {
   static mach_timebase_info_data_t s_timebase = {0, 0};
   uint64_t timestamp;
 
@@ -39,7 +39,7 @@ uint64_t amqp_get_monotonic_timestamp(void) {
 #ifdef AMQP_POSIX_TIMER_API
 #include <time.h>
 
-uint64_t amqp_get_monotonic_timestamp(void) {
+uint64_t amqp_get_monotonic_timestamp() {
 #ifdef __hpux
   return (uint64_t)gethrtime();
 #else
@@ -108,7 +108,7 @@ int amqp_time_s_from_now(amqp_time_t *time, int seconds) {
   return AMQP_STATUS_OK;
 }
 
-amqp_time_t amqp_time_infinite(void) {
+amqp_time_t amqp_time_infinite() {
   amqp_time_t time;
   time.time_point_ns = UINT64_MAX;
   return time;

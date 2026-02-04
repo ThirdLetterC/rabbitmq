@@ -23,7 +23,7 @@ typedef enum {
 
 typedef enum { AMQP_SC_NONE = 0, AMQP_SC_FORCE = 1 } amqp_socket_close_enum;
 
-int amqp_os_socket_error(void);
+int amqp_os_socket_error();
 
 int amqp_os_socket_close(int sockfd);
 

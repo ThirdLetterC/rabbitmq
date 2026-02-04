@@ -14,17 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef AMQP_INITIAL_FRAME_POOL_PAGE_SIZE
-#define AMQP_INITIAL_FRAME_POOL_PAGE_SIZE 65536
-#endif
-
-#ifndef AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE
-#define AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE 131072
-#endif
-
-#ifndef AMQP_DEFAULT_LOGIN_TIMEOUT_SEC
-#define AMQP_DEFAULT_LOGIN_TIMEOUT_SEC 12
-#endif
+static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE = 65'536;
+static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE = 131'072;
+static constexpr int AMQP_DEFAULT_LOGIN_TIMEOUT_SEC = 12;
 
 #define ENFORCE_STATE(statevec, statenum)                                   \
   {                                                                         \
@@ -37,7 +29,7 @@
           _wanted_state, _check_state->state);                              \
   }
 
-amqp_connection_state_t amqp_new_connection(void) {
+amqp_connection_state_t amqp_new_connection() {
   int res;
   amqp_connection_state_t state = (amqp_connection_state_t)calloc(
       1, sizeof(struct amqp_connection_state_t_));
@@ -61,7 +53,7 @@ amqp_connection_state_t amqp_new_connection(void) {
 
   state->sock_inbound_buffer.len = AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE;
   state->sock_inbound_buffer.bytes =
-      malloc(AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE);
+      calloc(1, AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE);
   if (state->sock_inbound_buffer.bytes == nullptr) {
     goto out_nomem;
   }

@@ -10,10 +10,6 @@
 
 /** \cond HIDE_FROM_DOXYGEN */
 
-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
-#error "rabbitmq-c no longer supports Windows or Cygwin platforms."
-#endif
-
 #ifdef __cplusplus
 #define AMQP_BEGIN_DECLS extern "C" {
 #define AMQP_END_DECLS }
@@ -94,10 +90,10 @@ AMQP_BEGIN_DECLS
  *  in CMakeLists.txt and configure.ac
  */
 
-#define AMQP_VERSION_MAJOR 0
-#define AMQP_VERSION_MINOR 16
-#define AMQP_VERSION_PATCH 0
-#define AMQP_VERSION_IS_RELEASE 0
+static constexpr uint8_t AMQP_VERSION_MAJOR = 0;
+static constexpr uint8_t AMQP_VERSION_MINOR = 16;
+static constexpr uint8_t AMQP_VERSION_PATCH = 0;
+static constexpr uint8_t AMQP_VERSION_IS_RELEASE = 0;
 
 /**
  * \def AMQP_VERSION_CODE
@@ -110,8 +106,11 @@ AMQP_BEGIN_DECLS
  *
  * \since v0.6.1
  */
-#define AMQP_VERSION_CODE(major, minor, patch, release) \
-  ((major << 24) | (minor << 16) | (patch << 8) | (release))
+static constexpr uint32_t AMQP_VERSION_CODE(uint32_t major, uint32_t minor,
+                                            uint32_t patch,
+                                            uint32_t release) {
+  return (major << 24u) | (minor << 16u) | (patch << 8u) | release;
+}
 
 /**
  * \def AMQP_VERSION
@@ -131,18 +130,9 @@ AMQP_BEGIN_DECLS
  *
  * \since v0.4.0
  */
-#define AMQP_VERSION                                        \
-  AMQP_VERSION_CODE(AMQP_VERSION_MAJOR, AMQP_VERSION_MINOR, \
-                    AMQP_VERSION_PATCH, AMQP_VERSION_IS_RELEASE)
-
-/** \cond HIDE_FROM_DOXYGEN */
-#define AMQ_STRINGIFY(s) AMQ_STRINGIFY_HELPER(s)
-#define AMQ_STRINGIFY_HELPER(s) #s
-
-#define AMQ_VERSION_STRING          \
-  AMQ_STRINGIFY(AMQP_VERSION_MAJOR) \
-  "." AMQ_STRINGIFY(AMQP_VERSION_MINOR) "." AMQ_STRINGIFY(AMQP_VERSION_PATCH)
-/** \endcond */
+static constexpr uint32_t AMQP_VERSION =
+    AMQP_VERSION_CODE(AMQP_VERSION_MAJOR, AMQP_VERSION_MINOR,
+                      AMQP_VERSION_PATCH, AMQP_VERSION_IS_RELEASE);
 
 /**
  * \def AMQP_VERSION_STRING
@@ -156,11 +146,7 @@ AMQP_BEGIN_DECLS
  *
  * \since v0.4.0
  */
-#if AMQP_VERSION_IS_RELEASE
-#define AMQP_VERSION_STRING AMQ_VERSION_STRING
-#else
-#define AMQP_VERSION_STRING AMQ_VERSION_STRING "-pre"
-#endif
+static constexpr char AMQP_VERSION_STRING[] = "0.16.0-pre";
 
 /**
  * Returns the rabbitmq-c version as a packed integer.
@@ -174,7 +160,7 @@ AMQP_BEGIN_DECLS
  * \since v0.4.0
  */
 AMQP_EXPORT
-uint32_t AMQP_CALL amqp_version_number(void);
+uint32_t AMQP_CALL amqp_version_number();
 
 /**
  * Returns the rabbitmq-c version as a string.
@@ -188,7 +174,7 @@ uint32_t AMQP_CALL amqp_version_number(void);
  * \since v0.1
  */
 AMQP_EXPORT
-char const *AMQP_CALL amqp_version(void);
+char const *AMQP_CALL amqp_version();
 
 /**
  * \def AMQP_DEFAULT_FRAME_SIZE
@@ -199,7 +185,7 @@ char const *AMQP_CALL amqp_version(void);
  *
  * \since v0.4.0
  */
-#define AMQP_DEFAULT_FRAME_SIZE 131072
+static constexpr int AMQP_DEFAULT_FRAME_SIZE = 131'072;
 
 /**
  * \def AMQP_DEFAULT_MAX_CHANNELS
@@ -213,7 +199,7 @@ char const *AMQP_CALL amqp_version(void);
  *
  * \since v0.4.0
  */
-#define AMQP_DEFAULT_MAX_CHANNELS 2047
+static constexpr int AMQP_DEFAULT_MAX_CHANNELS = 2'047;
 
 /**
  * \def AMQP_DEFAULT_HEARTBEAT
@@ -224,7 +210,7 @@ char const *AMQP_CALL amqp_version(void);
  *
  * \since v0.4.0
  */
-#define AMQP_DEFAULT_HEARTBEAT 0
+static constexpr int AMQP_DEFAULT_HEARTBEAT = 0;
 
 /**
  * \def AMQP_DEFAULT_VHOST
@@ -235,14 +221,14 @@ char const *AMQP_CALL amqp_version(void);
  *
  * \since v0.9.0
  */
-#define AMQP_DEFAULT_VHOST "/"
+static constexpr char AMQP_DEFAULT_VHOST[] = "/";
 
 /**
- * boolean type 0 = false, true otherwise
+ * boolean type
  *
  * \since v0.1
  */
-typedef int amqp_boolean_t;
+typedef bool amqp_boolean_t;
 
 /**
  * Method number
@@ -689,42 +675,6 @@ AMQP_EXPORT extern const amqp_table_t amqp_empty_table;
  */
 AMQP_EXPORT extern const amqp_array_t amqp_empty_array;
 
-/* Compatibility macros for the above, to avoid the need to update
-   code written against earlier versions of librabbitmq. */
-
-/**
- * \def AMQP_EMPTY_BYTES
- *
- * Deprecated, use \ref amqp_empty_bytes instead
- *
- * \deprecated use \ref amqp_empty_bytes instead
- *
- * \since v0.1
- */
-#define AMQP_EMPTY_BYTES amqp_empty_bytes
-
-/**
- * \def AMQP_EMPTY_TABLE
- *
- * Deprecated, use \ref amqp_empty_table instead
- *
- * \deprecated use \ref amqp_empty_table instead
- *
- * \since v0.1
- */
-#define AMQP_EMPTY_TABLE amqp_empty_table
-
-/**
- * \def AMQP_EMPTY_ARRAY
- *
- * Deprecated, use \ref amqp_empty_array instead
- *
- * \deprecated use \ref amqp_empty_array instead
- *
- * \since v0.1
- */
-#define AMQP_EMPTY_ARRAY amqp_empty_array
-
 /**
  * Initializes an amqp_pool_t memory allocation pool for use
  *
@@ -894,7 +844,7 @@ amqp_bytes_t AMQP_CALL amqp_cstring_bytes(char const *cstr);
  *
  * \since v0.1
  */
-AMQP_EXPORT
+[[nodiscard]] AMQP_EXPORT
 amqp_bytes_t AMQP_CALL amqp_bytes_malloc_dup(amqp_bytes_t src);
 
 /**
@@ -911,7 +861,7 @@ amqp_bytes_t AMQP_CALL amqp_bytes_malloc_dup(amqp_bytes_t src);
  *
  * \since v0.1
  */
-AMQP_EXPORT
+[[nodiscard]] AMQP_EXPORT
 amqp_bytes_t AMQP_CALL amqp_bytes_malloc(size_t amount);
 
 /**
@@ -944,7 +894,7 @@ void AMQP_CALL amqp_bytes_free(amqp_bytes_t bytes);
  * \since v0.1
  */
 [[nodiscard]] AMQP_EXPORT
-amqp_connection_state_t AMQP_CALL amqp_new_connection(void);
+amqp_connection_state_t AMQP_CALL amqp_new_connection();
 
 /**
  * Get the underlying socket descriptor for the connection

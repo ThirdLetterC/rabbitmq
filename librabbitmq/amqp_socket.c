@@ -38,11 +38,11 @@
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
                                  amqp_method_number_t *list);
 
-static int amqp_os_socket_init(void) {
+static int amqp_os_socket_init() {
   return AMQP_STATUS_OK;
 }
 
-int amqp_os_socket_error(void) {
+int amqp_os_socket_error() {
   return errno;
 }
 

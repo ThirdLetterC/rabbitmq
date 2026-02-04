@@ -9,12 +9,12 @@
 
 #include <openssl/bio.h>
 
-int amqp_openssl_bio_init(void);
+int amqp_openssl_bio_init();
 
-void amqp_openssl_bio_destroy(void);
+void amqp_openssl_bio_destroy();
 
 typedef const BIO_METHOD *BIO_METHOD_PTR;
 
-BIO_METHOD_PTR amqp_openssl_bio(void);
+BIO_METHOD_PTR amqp_openssl_bio();
 
 #endif /* ifndef AMQP_OPENSSL_BIO */

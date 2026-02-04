@@ -268,7 +268,7 @@ void AMQP_CALL amqp_set_initialize_ssl_library(amqp_boolean_t do_initialize);
  * \since v0.9.0
  */
 AMQP_DEPRECATED_EXPORT
-int AMQP_CALL amqp_initialize_ssl_library(void);
+int AMQP_CALL amqp_initialize_ssl_library();
 
 /**
  * Set the engine for underlying SSL/TLS library.
@@ -298,7 +298,7 @@ int amqp_set_ssl_engine(const char *engine);
  * \since v0.9.0
  */
 AMQP_DEPRECATED_EXPORT
-int AMQP_CALL amqp_uninitialize_ssl_library(void);
+int AMQP_CALL amqp_uninitialize_ssl_library();
 
 AMQP_END_DECLS
 

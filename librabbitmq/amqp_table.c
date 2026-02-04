@@ -43,7 +43,7 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  entries = malloc(allocated_entries * sizeof(amqp_field_value_t));
+  entries = calloc(allocated_entries, sizeof(amqp_field_value_t));
   if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
@@ -111,7 +111,7 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  entries = malloc(allocated_entries * sizeof(amqp_table_entry_t));
+  entries = calloc(allocated_entries, sizeof(amqp_table_entry_t));
   if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
