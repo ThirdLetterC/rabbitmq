@@ -5,3 +5,5 @@
 -Werror
 -Iinclude
 -Iexamples
+-Itools
+-Itools/unix
