@@ -35,6 +35,8 @@
 #include "rabbitmq-c/amqp_table.h"
 #include "rabbitmq-c/amqp_time.h"
 
+struct addrinfo;
+
 constexpr char AMQ_PLATFORM[] = "unknown";
 
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
@@ -92,7 +94,7 @@ int amqp_socket_get_sockfd(amqp_socket_t *self) {
   return self->klass->get_sockfd(self);
 }
 
-int amqp_poll(int fd, int event, amqp_time_t deadline) {
+int amqp_poll([[maybe_unused]] int fd, [[maybe_unused]] int event, [[maybe_unused]] amqp_time_t deadline) {
 #ifdef HAVE_POLL
   struct pollfd pfd;
   int res;
