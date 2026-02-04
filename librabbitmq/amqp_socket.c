@@ -35,6 +35,8 @@
 #include "rabbitmq-c/amqp_table.h"
 #include "rabbitmq-c/amqp_time.h"
 
+constexpr char AMQ_PLATFORM[] = "unknown";
+
 static int amqp_id_in_reply_list(amqp_method_number_t expected,
                                  amqp_method_number_t *list);
 
