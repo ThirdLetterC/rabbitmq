@@ -5,11 +5,7 @@
 #ifndef AMQP_FRAMING_H
 #define AMQP_FRAMING_H
 
-#ifdef _MSC_VER
-#   pragma message("warning: amqp_framing.h is deprecated, use rabbitmq-c/framing.h instead.")
-#else
-#   warning "amqp_framing.h is deprecated, use rabbitmq-c/framing.h instead."
-#endif
+#warning "amqp_framing.h is deprecated, use rabbitmq-c/framing.h instead."
 
 #include <rabbitmq-c/framing.h>
 

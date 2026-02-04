@@ -9,20 +9,14 @@ if (ENABLE_SSL_SUPPORT)
       amqp_openssl.c
       amqp_openssl_bio.c
       amqp_openssl_bio.h
+      unix/threads.h
   )
   set(AMQP_SSL_LIBS OpenSSL::SSL)
+  set(SSL_INCLUDE_DIRS unix)
   if (APPLE)
     # Apple has deprecated OpenSSL in 10.7+. This disables that warning.
     set_source_files_properties(${AMQP_SSL_SRCS}
       PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations)
-  endif()
-
-  if (WIN32 AND NOT CMAKE_USE_PTHREADS_INIT)
-    set(AMQP_SSL_SRCS ${AMQP_SSL_SRCS} win32/threads.h win32/threads.c)
-    set(SSL_INCLUDE_DIRS win32)
-  else()
-    set(AMQP_SSL_SRCS ${AMQP_SSL_SRCS} unix/threads.h)
-    set(SSL_INCLUDE_DIRS unix)
   endif()
 endif()
 
@@ -37,6 +31,8 @@ set(PRIVATE_INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${SSL_INCLUDE_DIRS}
 )
+
+set(RMQ_C_WARNING_FLAGS -Wall -Wextra -Wpedantic -Werror)
 
 set(RMQ_SOURCES
   ../include/amqp.h
@@ -84,10 +80,14 @@ if(BUILD_SHARED_LIBS)
   target_compile_definitions(rabbitmq PRIVATE -DHAVE_CONFIG_H)
 
   target_link_libraries(rabbitmq PRIVATE ${RMQ_LIBRARIES})
+  target_compile_options(rabbitmq PRIVATE ${RMQ_C_WARNING_FLAGS})
 
   set_target_properties(rabbitmq PROPERTIES
     VERSION ${RMQ_VERSION}
     SOVERSION ${RMQ_SOVERSION}
+    C_STANDARD 23
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS NO
   )
 
   if (APPLE)
@@ -95,10 +95,6 @@ if(BUILD_SHARED_LIBS)
       MACHO_CURRENT_VERSION ${RMQ_SOVERSION}.${RMQ_SOVERSION_AGE}.${RMQ_SOVERSION_REVISION}
       MACHO_COMPATIBILITY_VERSION ${RMQ_SOVERSION}
     )
-  endif()
-
-  if (WIN32)
-    set_target_properties(rabbitmq PROPERTIES OUTPUT_NAME rabbitmq.${RMQ_SOVERSION})
   endif()
 
   install(TARGETS rabbitmq EXPORT "${targets_export_name}"
@@ -133,10 +129,14 @@ if(BUILD_STATIC_LIBS)
   )
 
   target_link_libraries(rabbitmq-static PRIVATE ${RMQ_LIBRARIES})
+  target_compile_options(rabbitmq-static PRIVATE ${RMQ_C_WARNING_FLAGS})
 
   set_target_properties(rabbitmq-static PROPERTIES
     VERSION ${RMQ_VERSION}
     SOVERSION ${RMQ_SOVERSION}
+    C_STANDARD 23
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS NO
   )
 
   if (APPLE)
@@ -146,11 +146,7 @@ if(BUILD_STATIC_LIBS)
     )
   endif()
 
-  if (WIN32)
-    set_target_properties(rabbitmq-static PROPERTIES OUTPUT_NAME librabbitmq.${RMQ_SOVERSION})
-  else()
-    set_target_properties(rabbitmq-static PROPERTIES OUTPUT_NAME rabbitmq)
-  endif()
+  set_target_properties(rabbitmq-static PROPERTIES OUTPUT_NAME rabbitmq)
 
   if(INSTALL_STATIC_LIBS)
     install(TARGETS rabbitmq-static EXPORT "${targets_export_name}"

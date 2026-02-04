@@ -129,7 +129,7 @@ void amqp_socket_delete(amqp_socket_t *self);
  *
  * \param [in] host Connect to this host.
  * \param [in] port Connect on this remote port.
- * \param [in] timeout Max allowed time to spent on opening. If NULL - run in
+ * \param [in] timeout Max allowed time to spent on opening. If nullptr - run in
  * blocking mode
  *
  * \return File descriptor upon success, non-zero negative error code otherwise.

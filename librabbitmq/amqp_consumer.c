@@ -19,7 +19,7 @@ static int amqp_basic_properties_clone(amqp_basic_properties_t *original,
     clone = amqp_empty_bytes;                          \
   } else {                                             \
     amqp_pool_alloc_bytes(pool, original.len, &clone); \
-    if (NULL == clone.bytes) {                         \
+    if (nullptr == clone.bytes) {                         \
       return AMQP_STATUS_NO_MEMORY;                    \
     }                                                  \
     memcpy(clone.bytes, original.bytes, clone.len);    \
@@ -101,7 +101,7 @@ void amqp_destroy_envelope(amqp_envelope_t *envelope) {
 }
 
 static int amqp_bytes_malloc_dup_failed(amqp_bytes_t bytes) {
-  if (bytes.len != 0 && bytes.bytes == NULL) {
+  if (bytes.len != 0 && bytes.bytes == nullptr) {
     return 1;
   }
   return 0;
@@ -110,7 +110,7 @@ static int amqp_bytes_malloc_dup_failed(amqp_bytes_t bytes) {
 amqp_rpc_reply_t amqp_consume_message(amqp_connection_state_t state,
                                       amqp_envelope_t *envelope,
                                       const struct timeval *timeout,
-                                      AMQP_UNUSED int flags) {
+                                      [[maybe_unused]] int flags) {
   int res;
   amqp_frame_t frame;
   amqp_basic_deliver_t *delivery_method;
@@ -170,7 +170,7 @@ error_out1:
 amqp_rpc_reply_t amqp_read_message(amqp_connection_state_t state,
                                    amqp_channel_t channel,
                                    amqp_message_t *message,
-                                   AMQP_UNUSED int flags) {
+                                   [[maybe_unused]] int flags) {
   amqp_frame_t frame;
   amqp_rpc_reply_t ret;
 
@@ -226,7 +226,7 @@ amqp_rpc_reply_t amqp_read_message(amqp_connection_state_t state,
     }
     message->body =
         amqp_bytes_malloc((size_t)frame.payload.properties.body_size);
-    if (NULL == message->body.bytes) {
+    if (nullptr == message->body.bytes) {
       ret.reply_type = AMQP_RESPONSE_LIBRARY_EXCEPTION;
       ret.library_error = AMQP_STATUS_NO_MEMORY;
       goto error_out1;

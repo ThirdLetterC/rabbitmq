@@ -20,11 +20,11 @@ AMQP_BEGIN_DECLS
  *
  * Call amqp_connection_close() to release socket resources.
  *
- * \return A new socket object or NULL if an error occurred.
+ * \return A new socket object or nullptr if an error occurred.
  *
  * \since v0.4.0
  */
-AMQP_EXPORT
+[[nodiscard]] AMQP_EXPORT
 amqp_socket_t *AMQP_CALL amqp_tcp_socket_new(amqp_connection_state_t state);
 
 /**

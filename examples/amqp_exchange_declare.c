@@ -16,7 +16,7 @@ int main(int argc, char const *const *argv) {
   int port, status;
   char const *exchange;
   char const *exchangetype;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   if (argc < 5) {

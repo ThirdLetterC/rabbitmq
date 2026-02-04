@@ -8,16 +8,16 @@
 #include "common.h"
 #include "process.h"
 
-#define MAX_LISTEN_KEYS 1024
-#define LISTEN_KEYS_DELIMITER ","
+static constexpr int max_listen_keys = 1'024;
+static constexpr char listen_keys_delimiter[] = ",";
 
 /* Convert a amqp_bytes_t to an escaped string form for printing.  We
    use the same escaping conventions as rabbitmqctl. */
 static char *stringify_bytes(amqp_bytes_t bytes) {
   /* We will need up to 4 chars per byte, plus the terminating 0 */
   char *res = malloc(bytes.len * 4 + 1);
-  if (res == NULL) {
-    return NULL;
+  if (res == nullptr) {
+    return nullptr;
   }
   uint8_t *data = bytes.bytes;
   char *p = res;
@@ -70,7 +70,7 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
       char *sq;
       queue_bytes = amqp_bytes_malloc_dup(res->queue);
       sq = stringify_bytes(queue_bytes);
-      if (sq == NULL) {
+      if (sq == nullptr) {
         fprintf(stderr, "Memory allocation failed.\n");
         exit(1);
       }
@@ -83,16 +83,16 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
       amqp_bytes_t eb = amqp_cstring_bytes(exchange);
 
       routing_tmp = strdup(routing_key);
-      if (NULL == routing_tmp) {
+      if (nullptr == routing_tmp) {
         fprintf(stderr, "could not allocate memory to parse routing key\n");
         exit(1);
       }
 
       for (routing_key_token =
-               strtok_r(routing_tmp, LISTEN_KEYS_DELIMITER, &routing_key_rest);
-           NULL != routing_key_token && routing_key_count < MAX_LISTEN_KEYS - 1;
+               strtok_r(routing_tmp, listen_keys_delimiter, &routing_key_rest);
+           nullptr != routing_key_token && routing_key_count < max_listen_keys - 1;
            routing_key_token =
-               strtok_r(NULL, LISTEN_KEYS_DELIMITER, &routing_key_rest)) {
+               strtok_r(nullptr, listen_keys_delimiter, &routing_key_rest)) {
 
         if (!amqp_queue_bind(conn, 1, queue_bytes, eb,
                              cstring_bytes(routing_key_token),
@@ -107,7 +107,7 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
   return queue_bytes;
 }
 
-#define AMQP_CONSUME_MAX_PREFETCH_COUNT 65535
+static constexpr int amqp_consume_max_prefetch_count = 65'535;
 
 static void do_consume(amqp_connection_state_t conn, amqp_bytes_t queue,
                        int no_ack, int count, int prefetch_count,
@@ -115,17 +115,18 @@ static void do_consume(amqp_connection_state_t conn, amqp_bytes_t queue,
   int i;
 
   /* If there is a limit, set the qos to match */
-  if (count > 0 && count <= AMQP_CONSUME_MAX_PREFETCH_COUNT &&
+  if (count > 0 && count <= amqp_consume_max_prefetch_count &&
       !amqp_basic_qos(conn, 1, 0, count, 0)) {
     die_rpc(amqp_get_rpc_reply(conn), "basic.qos");
   }
 
   /* if there is a maximum number of messages to be received at a time, set the
    * qos to match */
-  if (prefetch_count > 0 && prefetch_count <= AMQP_CONSUME_MAX_PREFETCH_COUNT) {
+  if (prefetch_count > 0 &&
+      prefetch_count <= amqp_consume_max_prefetch_count) {
     /* the maximum number of messages to be received at a time must be less
      * than the global maximum number of messages. */
-    if (!(count > 0 && count <= AMQP_CONSUME_MAX_PREFETCH_COUNT &&
+    if (!(count > 0 && count <= amqp_consume_max_prefetch_count &&
           prefetch_count >= count)) {
       if (!amqp_basic_qos(conn, 1, 0, prefetch_count, 0)) {
         die_rpc(amqp_get_rpc_reply(conn), "basic.qos");
@@ -168,9 +169,9 @@ int main(int argc, const char **argv) {
   poptContext opts;
   amqp_connection_state_t conn;
   const char *const *cmd_argv;
-  static char *queue = NULL;
-  static char *exchange = NULL;
-  static char *routing_key = NULL;
+  static char *queue = nullptr;
+  static char *exchange = nullptr;
+  static char *routing_key = nullptr;
   static int declare = 0;
   static int exclusive = 0;
   static int no_ack = 0;
@@ -188,16 +189,16 @@ int main(int argc, const char **argv) {
        "the routing key to bind with", "routing key"},
       {"declare", 'd', POPT_ARG_NONE, &declare, 0,
        "declare an exclusive queue (deprecated, use --exclusive instead)",
-       NULL},
+       nullptr},
       {"exclusive", 'x', POPT_ARG_NONE, &exclusive, 0,
-       "declare the queue as exclusive", NULL},
+       "declare the queue as exclusive", nullptr},
       {"no-ack", 'A', POPT_ARG_NONE, &no_ack, 0, "consume in no-ack mode",
-       NULL},
+       nullptr},
       {"count", 'c', POPT_ARG_INT, &count, 0,
        "stop consuming after this many messages are consumed", "limit"},
       {"prefetch-count", 'p', POPT_ARG_INT, &prefetch_count, 0,
        "receive only this many message at a time from the server", "limit"},
-      POPT_AUTOHELP{NULL, '\0', 0, NULL, 0, NULL, NULL}};
+      POPT_AUTOHELP{nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
   opts = process_options(argc, argv, options, "[OPTIONS]... <command> <args>");
 

@@ -5,10 +5,6 @@
 #include "config.h"
 #endif
 
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include "amqp_private.h"
 #include "amqp_time.h"
 #include "rabbitmq-c/tcp_socket.h"
@@ -46,8 +42,8 @@ amqp_connection_state_t amqp_new_connection(void) {
   amqp_connection_state_t state = (amqp_connection_state_t)calloc(
       1, sizeof(struct amqp_connection_state_t_));
 
-  if (state == NULL) {
-    return NULL;
+  if (state == nullptr) {
+    return nullptr;
   }
 
   res = amqp_tune_connection(state, 0, AMQP_INITIAL_FRAME_POOL_PAGE_SIZE, 0);
@@ -66,7 +62,7 @@ amqp_connection_state_t amqp_new_connection(void) {
   state->sock_inbound_buffer.len = AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE;
   state->sock_inbound_buffer.bytes =
       malloc(AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE);
-  if (state->sock_inbound_buffer.bytes == NULL) {
+  if (state->sock_inbound_buffer.bytes == nullptr) {
     goto out_nomem;
   }
 
@@ -82,7 +78,7 @@ amqp_connection_state_t amqp_new_connection(void) {
 out_nomem:
   free(state->sock_inbound_buffer.bytes);
   free(state);
-  return NULL;
+  return nullptr;
 }
 
 int amqp_get_sockfd(amqp_connection_state_t state) {
@@ -134,7 +130,7 @@ int amqp_tune_connection(amqp_connection_state_t state, int channel_max,
 
   state->outbound_buffer.len = frame_max;
   newbuf = realloc(state->outbound_buffer.bytes, frame_max);
-  if (newbuf == NULL) {
+  if (newbuf == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
   state->outbound_buffer.bytes = newbuf;
@@ -160,7 +156,7 @@ int amqp_destroy_connection(amqp_connection_state_t state) {
     int i;
     for (i = 0; i < POOL_TABLE_SIZE; ++i) {
       amqp_pool_table_entry_t *entry = state->pool_table[i];
-      while (NULL != entry) {
+      while (nullptr != entry) {
         amqp_pool_table_entry_t *todelete = entry;
         empty_amqp_pool(&entry->pool);
         entry = entry->next;
@@ -275,12 +271,12 @@ int amqp_handle_input(amqp_connection_state_t state, amqp_bytes_t received_data,
       }
 
       channel_pool = amqp_get_or_create_channel_pool(state, channel);
-      if (NULL == channel_pool) {
+      if (nullptr == channel_pool) {
         return AMQP_STATUS_NO_MEMORY;
       }
 
       amqp_pool_alloc_bytes(channel_pool, frame_size, &state->inbound_buffer);
-      if (NULL == state->inbound_buffer.bytes) {
+      if (nullptr == state->inbound_buffer.bytes) {
         return AMQP_STATUS_NO_MEMORY;
       }
       memcpy(state->inbound_buffer.bytes, state->header_buffer, HEADER_SIZE);
@@ -314,7 +310,7 @@ int amqp_handle_input(amqp_connection_state_t state, amqp_bytes_t received_data,
 
       channel_pool =
           amqp_get_or_create_channel_pool(state, decoded_frame->channel);
-      if (NULL == channel_pool) {
+      if (nullptr == channel_pool) {
         return AMQP_STATUS_NO_MEMORY;
       }
 
@@ -390,7 +386,7 @@ void amqp_release_buffers(amqp_connection_state_t state) {
   for (i = 0; i < POOL_TABLE_SIZE; ++i) {
     amqp_pool_table_entry_t *entry = state->pool_table[i];
 
-    for (; NULL != entry; entry = entry->next) {
+    for (; nullptr != entry; entry = entry->next) {
       amqp_maybe_release_buffers_on_channel(state, entry->channel);
     }
   }
@@ -412,7 +408,7 @@ void amqp_maybe_release_buffers_on_channel(amqp_connection_state_t state,
 
   queued_link = state->first_queued_frame;
 
-  while (NULL != queued_link) {
+  while (nullptr != queued_link) {
     amqp_frame_t *frame = queued_link->data;
     if (channel == frame->channel) {
       return;
@@ -423,7 +419,7 @@ void amqp_maybe_release_buffers_on_channel(amqp_connection_state_t state,
 
   pool = amqp_get_channel_pool(state, channel);
 
-  if (pool != NULL) {
+  if (pool != nullptr) {
     recycle_amqp_pool(pool);
   }
 }

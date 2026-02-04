@@ -255,7 +255,7 @@ def genErl(spec):
         print("    case %s: {" % (m.defName(),))
         print("      %s *m = (%s *) amqp_pool_alloc(pool, sizeof(%s));" % \
             (m.structName(), m.structName(), m.structName()))
-        print("      if (m == NULL) { return AMQP_STATUS_NO_MEMORY; }")
+        print("      if (m == nullptr) { return AMQP_STATUS_NO_MEMORY; }")
 
         emitter = BitDecoder(Emitter("      "))
         for f in m.arguments:
@@ -269,7 +269,7 @@ def genErl(spec):
         print("    case %d: {" % (c.index,))
         print("      %s *p = (%s *) amqp_pool_alloc(pool, sizeof(%s));" % \
               (c.structName(), c.structName(), c.structName()))
-        print("      if (p == NULL) { return AMQP_STATUS_NO_MEMORY; }")
+        print("      if (p == nullptr) { return AMQP_STATUS_NO_MEMORY; }")
         print("      p->_flags = flags;")
 
         emitter = Emitter("      ")
@@ -350,7 +350,7 @@ amqp_boolean_t amqp_constant_is_hard_error(int constantNumber) {
 char const *amqp_method_name(amqp_method_number_t methodNumber) {
   switch (methodNumber) {""")
     for m in methods: genLookupMethodName(m)
-    print("""    default: return NULL;
+    print("""    default: return nullptr;
   }
 }""")
 

@@ -4,11 +4,7 @@
 #ifndef AMQP_H
 #define AMQP_H
 
-#ifdef _MSC_VER
-#   pragma message("warning: amqp.h is deprecated, use rabbitmq-c/amqp.h instead.")
-#else
-#   warning "amqp.h is deprecated, use rabbitmq-c/amqp.h instead."
-#endif
+#warning "amqp.h is deprecated, use rabbitmq-c/amqp.h instead."
 
 #include <rabbitmq-c/amqp.h>
 

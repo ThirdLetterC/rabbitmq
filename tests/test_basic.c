@@ -9,11 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <WinSock2.h>
-#else
 #include <sys/time.h>
-#endif
 
 #ifdef NDEBUG
 #undef NDEBUG
@@ -39,7 +35,7 @@ amqp_connection_state_t setup_connection_and_channel(void) {
 
   amqp_channel_open_ok_t *res =
       amqp_channel_open(connection_state_, fixed_channel_id);
-  assert(res != NULL);
+  assert(res != nullptr);
 
   return connection_state_;
 }
@@ -83,7 +79,7 @@ void queue_declare(amqp_connection_state_t connection_state_,
       /*durable*/ 0,
       /*exclusive*/ 0,
       /*auto_delete*/ 1, amqp_empty_table);
-  assert(res != NULL);
+  assert(res != nullptr);
 }
 
 char *basic_get(amqp_connection_state_t connection_state_,
@@ -110,8 +106,8 @@ char *basic_get(amqp_connection_state_t connection_state_,
   assert(rpc_reply.reply_type == AMQP_RESPONSE_NORMAL);
 
   char *body = malloc(message.body.len);
-  if (body == NULL) {
-    return NULL;
+  if (body == nullptr) {
+    return nullptr;
   }
   memcpy(body, message.body.bytes, message.body.len);
   *out_body_size_ = message.body.len;
@@ -129,7 +125,7 @@ void publish_and_basic_get_message(const char *msg_to_publish) {
   uint64_t body_size;
   char *msg = basic_get(connection_state, test_queue_name, &body_size);
 
-  assert(msg != NULL && "Test errored: memory allocation failed!");
+  assert(msg != nullptr && "Test errored: memory allocation failed!");
   assert(body_size == strlen(msg_to_publish));
   assert(strncmp(msg_to_publish, msg, body_size) == 0);
   free(msg);
@@ -145,7 +141,7 @@ char *consume_message(amqp_connection_state_t connection_state_,
                          /*no_local*/ 0,
                          /*no_ack*/ 1,
                          /*exclusive*/ 0, amqp_empty_table);
-  assert(result != NULL);
+  assert(result != nullptr);
 
   amqp_envelope_t envelope;
   struct timeval timeout = {5, 0};
@@ -155,8 +151,8 @@ char *consume_message(amqp_connection_state_t connection_state_,
 
   *out_body_size_ = envelope.message.body.len;
   char *body = malloc(*out_body_size_);
-  if (body == NULL) {
-    return NULL;
+  if (body == nullptr) {
+    return nullptr;
   }
   if (*out_body_size_) {
     memcpy(body, envelope.message.body.bytes, *out_body_size_);
@@ -175,7 +171,7 @@ void publish_and_consume_message(const char *msg_to_publish) {
   uint64_t body_size;
   char *msg = consume_message(connection_state, test_queue_name, &body_size);
 
-  assert(msg != NULL && "Test errored: memory allocation failed!");
+  assert(msg != nullptr && "Test errored: memory allocation failed!");
   assert(body_size == strlen(msg_to_publish));
   assert(strncmp(msg_to_publish, msg, body_size) == 0);
   free(msg);

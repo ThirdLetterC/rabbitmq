@@ -10,6 +10,10 @@
 
 /** \cond HIDE_FROM_DOXYGEN */
 
+#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+#error "rabbitmq-c no longer supports Windows or Cygwin platforms."
+#endif
+
 #ifdef __cplusplus
 #define AMQP_BEGIN_DECLS extern "C" {
 #define AMQP_END_DECLS }
@@ -20,42 +24,15 @@
 
 /*
  * \internal
- * AMQP_CALL - calling convension (used on Win32)
+ * AMQP_CALL - calling convention (unused on POSIX-only builds)
  */
-#ifdef _WIN32
-#define AMQP_CALL __cdecl
-#else
 #define AMQP_CALL
-#endif
-
-/* Define ssize_t on Win32/64 platforms
-   See: http://lists.cs.uiuc.edu/pipermail/llvmdev/2010-April/030649.html for
-   details
-   */
-#if !defined(_W64)
-#if !defined(__midl) && (defined(_X86_) || defined(_M_IX86)) && _MSC_VER >= 1300
-#define _W64 __w64
-#else
-#define _W64
-#endif
-#endif
-
-#if defined(_MSC_VER) || (defined(__BORLANDC__) && (__BORLANDC__ <= 0x0564))
-#ifdef _WIN64
-typedef __int64 ssize_t;
-#else
-typedef _W64 int ssize_t;
-#endif
-#endif
-
-#if defined(_WIN32) && defined(__MINGW32__)
-#include <sys/types.h>
-#endif
 
 /** \endcond */
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 struct timeval;
 
@@ -811,11 +788,11 @@ void AMQP_CALL empty_amqp_pool(amqp_pool_t *pool);
  * Allocates a block of memory from an amqp_pool_t memory pool
  *
  * Memory will be aligned on a 8-byte boundary. If a 0-length allocation is
- * requested, a NULL pointer will be returned.
+ * requested, a nullptr pointer will be returned.
  *
  * \param [in] pool the allocation pool to allocate the memory from
  * \param [in] amount the size of the allocation in bytes.
- * \return a pointer to the memory block, or NULL if the allocation cannot
+ * \return a pointer to the memory block, or nullptr if the allocation cannot
  *          be satisfied.
  *
  * \sa init_amqp_pool(), recycle_amqp_pool(), empty_amqp_pool(),
@@ -830,14 +807,14 @@ void *AMQP_CALL amqp_pool_alloc(amqp_pool_t *pool, size_t amount);
  * Allocates a block of memory from an amqp_pool_t to an amqp_bytes_t
  *
  * Memory will be aligned on a 8-byte boundary. If a 0-length allocation is
- * requested, output.bytes = NULL.
+ * requested, output.bytes = nullptr.
  *
  * \param [in] pool the allocation pool to allocate the memory from
  * \param [in] amount the size of the allocation in bytes
  * \param [in] output the location to store the pointer. On success
  *              output.bytes will be set to the beginning of the buffer
  *              output.len will be set to amount
- *              On error output.bytes will be set to NULL and output.len
+ *              On error output.bytes will be set to nullptr and output.len
  *              set to 0
  *
  * \sa init_amqp_pool(), recycle_amqp_pool(), empty_amqp_pool(),
@@ -928,7 +905,7 @@ amqp_bytes_t AMQP_CALL amqp_bytes_malloc_dup(amqp_bytes_t src);
  *
  * \param [in] amount the size of the buffer in bytes
  * \returns an amqp_bytes_t with amount bytes allocated.
- *           output.bytes will be set to NULL on error
+ *           output.bytes will be set to nullptr on error
  *
  * \sa amqp_bytes_free(), amqp_bytes_malloc_dup()
  *
@@ -960,13 +937,13 @@ void AMQP_CALL amqp_bytes_free(amqp_bytes_t bytes);
  * amqp_connection_state_t objects created with this function
  * should be freed with amqp_destroy_connection()
  *
- * \returns an opaque pointer on success, NULL or 0 on failure.
+ * \returns an opaque pointer on success, nullptr on failure.
  *
  * \sa amqp_destroy_connection()
  *
  * \since v0.1
  */
-AMQP_EXPORT
+[[nodiscard]] AMQP_EXPORT
 amqp_connection_state_t AMQP_CALL amqp_new_connection(void);
 
 /**
@@ -1302,10 +1279,10 @@ int AMQP_CALL amqp_table_entry_cmp(void const *entry1, void const *entry2);
  * \return a positive value indicates success and is the sockfd. A negative
  *  value (see amqp_status_enum)is returned on failure. Possible error codes:
  *  - AMQP_STATUS_TCP_SOCKETLIB_INIT_ERROR Initialization of underlying socket
- *    library failed.
+ *    library failed (legacy; not expected on POSIX-only builds).
  *  - AMQP_STATUS_HOSTNAME_RESOLUTION_FAILED hostname lookup failed.
- *  - AMQP_STATUS_SOCKET_ERROR a socket error occurred. errno or
- *    WSAGetLastError() may return more useful information.
+ *  - AMQP_STATUS_SOCKET_ERROR a socket error occurred. errno may provide more
+ *    useful information.
  *
  * \note IPv6 support was added in v0.3
  *
@@ -1330,8 +1307,7 @@ int AMQP_CALL amqp_open_socket(char const *hostname, int portnumber);
  *  error codes:
  * - AMQP_STATUS_CONNECTION_CLOSED the connection to the broker was closed.
  * - AMQP_STATUS_SOCKET_ERROR a socket error occurred. It is likely the
- *   underlying socket has been closed. errno or WSAGetLastError() may provide
- *   further information.
+ *   underlying socket has been closed. errno may provide further information.
  * - AMQP_STATUS_SSL_ERROR a SSL error occurred. The connection to the broker
  *   was closed.
  *
@@ -1425,7 +1401,7 @@ int AMQP_CALL amqp_simple_wait_frame(amqp_connection_state_t state,
  * will test to see if a frame can be read from the broker, and return
  * immediately.
  *
- * If NULL is passed in for tv, the function will behave like
+ * If nullptr is passed in for tv, the function will behave like
  * amqp_simple_wait_frame() and block until a frame is received from the broker
  *
  * The library may buffer frames.  When an amqp_connection_state_t object
@@ -1448,7 +1424,7 @@ int AMQP_CALL amqp_simple_wait_frame(amqp_connection_state_t state,
  * \param [out] decoded_frame the frame
  * \param [in] tv the maximum time to wait for a frame to be read. Setting
  * tv->tv_sec = 0 and tv->tv_usec = 0 will do a non-blocking read. Specifying
- * NULL for tv will make the function block until a frame is read.
+ * nullptr for tv will make the function block until a frame is read.
  * \return AMQP_STATUS_OK on success. An amqp_status_enum value is returned
  *  otherwise. Possible errors include:
  *  - AMQP_STATUS_TIMEOUT the timeout was reached while waiting for a frame
@@ -1606,7 +1582,7 @@ amqp_rpc_reply_t AMQP_CALL amqp_simple_rpc(
  * \param [in] request_id the method number of the request
  * \param [in] reply_id the method number expected in response
  * \param [in] decoded_request_method the request method
- * \return a pointer to the method returned from the broker, or NULL on error.
+ * \return a pointer to the method returned from the broker, or nullptr on error.
  *  On error amqp_get_rpc_reply() will return an amqp_rpc_reply_t with
  *  details on the error that occurred.
  *
@@ -1624,7 +1600,7 @@ void *AMQP_CALL amqp_simple_rpc_decoded(amqp_connection_state_t state,
  *
  * The API methods corresponding to most synchronous AMQP methods
  * return a pointer to the decoded method result.  Upon error, they
- * return NULL, and we need some way of discovering what, if anything,
+ * return nullptr, and we need some way of discovering what, if anything,
  * went wrong. amqp_get_rpc_reply() returns the most recent
  * amqp_rpc_reply_t instance corresponding to such an API operation
  * for the given connection.
@@ -1830,8 +1806,8 @@ struct amqp_basic_properties_t_;
  *           to fit in a single frame. Message was not sent.
  *         - AMQP_STATUS_CONNECTION_CLOSED: the connection was closed.
  *         - AMQP_STATUS_SSL_ERROR: a SSL error occurred.
- *         - AMQP_STATUS_TCP_ERROR: a TCP error occurred. errno or
- *           WSAGetLastError() may provide more information
+ *         - AMQP_STATUS_TCP_ERROR: a TCP error occurred. errno may provide
+ *           more information.
  *
  * Note: this function does heartbeat processing as of v0.4.0
  *
@@ -2162,7 +2138,7 @@ typedef struct amqp_envelope_t_ {
  *                 the fields in the envelope object. The caller is responsible
  *                 for allocating/destroying the amqp_envelope_t object itself.
  * \param [in] timeout a timeout to wait for a message delivery. Passing in
- *             NULL will result in blocking behavior.
+ *             nullptr will result in blocking behavior.
  * \param [in] flags pass in 0. Currently unused.
  * \returns a amqp_rpc_reply_t object.  ret.reply_type == AMQP_RESPONSE_NORMAL
  *          on success. If ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION,
@@ -2287,7 +2263,7 @@ int AMQP_CALL amqp_socket_open(amqp_socket_t *self, const char *host, int port);
  * \param [in,out] self A socket object.
  * \param [in] host Connect to this host.
  * \param [in] port Connect on this remote port.
- * \param [in] timeout Max allowed time to spent on opening. If NULL - run in
+ * \param [in] timeout Max allowed time to spent on opening. If nullptr - run in
  *             blocking mode
  *
  * \return AMQP_STATUS_OK on success, an amqp_status_enum on failure.
@@ -2319,7 +2295,7 @@ int AMQP_CALL amqp_socket_get_sockfd(amqp_socket_t *self);
  * Get the socket object associated with a amqp_connection_state_t
  *
  * \param [in] state the connection object to get the socket from
- * \return a pointer to the socket object, or NULL if one has not been assigned
+ * \return a pointer to the socket object, or nullptr if one has not been assigned
  *
  * \since v0.4.0
  */
@@ -2370,7 +2346,7 @@ amqp_table_t *AMQP_CALL
  *
  * \param [in] state the connection object
  * \return a struct timeval representing the current login timeout for the state
- *  object. A NULL value represents an infinite timeout. The memory returned is
+ *  object. A nullptr value represents an infinite timeout. The memory returned is
  *  owned by the connection object.
  *
  * \since v0.9.0
@@ -2395,7 +2371,7 @@ struct timeval *AMQP_CALL
  *
  * \param [in] state the connection object
  * \param [in] timeout a struct timeval* representing new login timeout for the
- *  state object. NULL represents an infinite timeout. The value of timeout is
+ *  state object. nullptr represents an infinite timeout. The value of timeout is
  *  copied internally, the caller is responsible for ownership of the passed in
  *  pointer, it does not need to remain valid after this function is called.
  * \return AMQP_STATUS_OK on success.
@@ -2414,7 +2390,7 @@ int AMQP_CALL amqp_set_handshake_timeout(amqp_connection_state_t state,
  * function with a new timeout. The timeout applies individually to each RPC
  * that is made.
  *
- * The default value is NULL, or an infinite timeout.
+ * The default value is nullptr, or an infinite timeout.
  *
  * When an RPC times out, the function will return an error AMQP_STATUS_TIMEOUT,
  * and the connection will be closed.
@@ -2426,7 +2402,7 @@ int AMQP_CALL amqp_set_handshake_timeout(amqp_connection_state_t state,
  *
  * \param [in] state the connection object
  * \return a struct timeval representing the current RPC timeout for the state
- * object. A NULL value represents an infinite timeout. The memory returned is
+ * object. A nullptr value represents an infinite timeout. The memory returned is
  * owned by the connection object.
  *
  * \since v0.9.0
@@ -2441,7 +2417,7 @@ struct timeval *AMQP_CALL amqp_get_rpc_timeout(amqp_connection_state_t state);
  * This timeout may be changed at any time by calling this function with a new
  * timeout. The timeout applies individually to each RPC that is made.
  *
- * The default value is NULL, or an infinite timeout.
+ * The default value is nullptr, or an infinite timeout.
  *
  * When an RPC times out, the function will return an error AMQP_STATUS_TIMEOUT,
  * and the connection will be closed.
@@ -2453,7 +2429,7 @@ struct timeval *AMQP_CALL amqp_get_rpc_timeout(amqp_connection_state_t state);
  *
  * \param [in] state the connection object
  * \param [in] timeout a struct timeval* representing new RPC timeout for the
- * state object. NULL represents an infinite timeout. The value of timeout is
+ * state object. nullptr represents an infinite timeout. The value of timeout is
  * copied internally, the caller is responsible for ownership of the passed
  * pointer, it does not need to remain valid after this function is called.
  * \return AMQP_STATUS_SUCCESS on success.
@@ -2503,7 +2479,7 @@ typedef struct amqp_publisher_confirm_t_ {
  * - The `payload` is a union, and based on the `method` it will use one of `amqp_basic_ack_t`, `amqp_basic_nack_t`, or `amqp_basic_reject_t`
  *
  * \param [in] state connection state
- * \param [in] timeout when waiting for the frame. Passing NULL will result in
+ * \param [in] timeout when waiting for the frame. Passing nullptr will result in
  * blocking behavior
  * \param [out] The result of the publisher confirm wait.
  */

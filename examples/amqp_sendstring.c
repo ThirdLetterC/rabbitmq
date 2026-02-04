@@ -17,7 +17,7 @@ int main(int argc, char const *const *argv) {
   char const *exchange;
   char const *routingkey;
   char const *messagebody;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   if (argc < 6) {

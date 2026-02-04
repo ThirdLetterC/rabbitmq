@@ -28,7 +28,7 @@ void pipeline(const char *const *argv, struct pipeline *pl) {
   die_errno(posix_spawn_file_actions_addclose(&file_acts, pipefds[1]),
             "posix_spawn_file_actions_addclose");
 
-  die_errno(posix_spawnp(&pl->pid, argv[0], &file_acts, NULL,
+  die_errno(posix_spawnp(&pl->pid, argv[0], &file_acts, nullptr,
                          (char *const *)argv, environ),
             "posix_spawnp: %s", argv[0]);
 

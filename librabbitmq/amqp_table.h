@@ -48,7 +48,7 @@ amqp_table_entry_t amqp_table_construct_bool_entry(const char *key,
  * \param [in] table the table to search.
  * \param [in] key the string to search with.
  * \returns a pointer to the table entry in the table if a matching key can be
- * found, NULL otherwise.
+ * found, nullptr otherwise.
  */
 amqp_table_entry_t *amqp_table_get_entry_by_key(const amqp_table_t *table,
                                                 const amqp_bytes_t key);

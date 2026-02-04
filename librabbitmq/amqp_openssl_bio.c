@@ -6,15 +6,8 @@
 
 #include <assert.h>
 #include <errno.h>
-#if ((defined(_WIN32)) || (defined(__MINGW32__)) || (defined(__MINGW64__)))
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#else
 #include <sys/socket.h>
 #include <sys/types.h>
-#endif
 
 #ifdef MSG_NOSIGNAL
 #define AMQP_USE_AMQP_BIO
@@ -32,9 +25,6 @@ static int amqp_openssl_bio_should_retry(int res) {
     if (
 #ifdef EWOULDBLOCK
         err == EWOULDBLOCK ||
-#endif
-#ifdef WSAEWOULDBLOCK
-        err == WSAEWOULDBLOCK ||
 #endif
 #ifdef ENOTCONN
         err == ENOTCONN ||
@@ -140,7 +130,7 @@ void amqp_openssl_bio_destroy(void) {
   assert(amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
   BIO_meth_free(amqp_bio_method);
-  amqp_bio_method = NULL;
+  amqp_bio_method = nullptr;
 #endif
   amqp_ssl_bio_initialized = 0;
 }

@@ -11,14 +11,7 @@
 
 #include <assert.h>
 
-#ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <Winsock2.h>
-#else
 #include <sys/time.h>
-#endif
 
 #include "utils.h"
 
@@ -49,7 +42,7 @@ int main(int argc, char const *const *argv) {
     tv->tv_sec = timeout;
     tv->tv_usec = 0;
   } else {
-    tv = NULL;
+    tv = nullptr;
   }
 
   conn = amqp_new_connection();

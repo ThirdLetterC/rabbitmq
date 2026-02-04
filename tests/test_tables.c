@@ -1,11 +1,6 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -362,26 +357,26 @@ static void test_table_codec(FILE *out) {
   empty_amqp_pool(&pool);
 }
 
-#define CHUNK_SIZE 4096
+static constexpr size_t chunk_size = 4'096;
 
 static int compare_files(FILE *f1_in, FILE *f2_in) {
-  char f1_buf[CHUNK_SIZE];
-  char f2_buf[CHUNK_SIZE];
+  char f1_buf[chunk_size];
+  char f2_buf[chunk_size];
   int res;
 
   rewind(f1_in);
   rewind(f2_in);
 
   for (;;) {
-    size_t f1_got = fread(f1_buf, 1, CHUNK_SIZE, f1_in);
-    size_t f2_got = fread(f2_buf, 1, CHUNK_SIZE, f2_in);
+    size_t f1_got = fread(f1_buf, 1, chunk_size, f1_in);
+    size_t f2_got = fread(f2_buf, 1, chunk_size, f2_in);
     res = memcmp(f1_buf, f2_buf, f1_got < f2_got ? f1_got : f2_got);
 
     if (res) {
       break;
     }
 
-    if (f1_got < CHUNK_SIZE || f2_got < CHUNK_SIZE) {
+    if (f1_got < chunk_size || f2_got < chunk_size) {
       if (f1_got != f2_got) {
         res = (f1_got < f2_got ? -1 : 1);
       }
@@ -396,11 +391,11 @@ const char *expected_file_name = "tests/test_tables.expected";
 
 int main(void) {
   char *srcdir = getenv("srcdir");
-  FILE *out, *expected = NULL;
+  FILE *out, *expected = nullptr;
   char *expected_path;
 
   out = tmpfile();
-  if (out == NULL) {
+  if (out == nullptr) {
     die("failed to create temporary file: %s", strerror(errno));
   }
 
@@ -408,15 +403,22 @@ int main(void) {
   fprintf(out, "----------\n");
   test_dump_value(out);
 
-  if (srcdir == NULL) {
+  if (srcdir == nullptr) {
     srcdir = ".";
   }
 
-  expected_path = malloc(strlen(srcdir) + strlen(expected_file_name) + 2);
-  if (!expected_path) {
+  auto expected_path_size = strlen(srcdir) + strlen(expected_file_name) + 2;
+  expected_path = malloc(expected_path_size);
+  if (expected_path == nullptr) {
     die("out of memory");
   }
-  sprintf(expected_path, "%s/%s", srcdir, expected_file_name);
+  {
+    auto written = snprintf(expected_path, expected_path_size, "%s/%s", srcdir,
+                            expected_file_name);
+    if (written < 0 || (size_t)written >= expected_path_size) {
+      die("failed to format expected path");
+    }
+  }
   expected = fopen(expected_path, "r");
   if (!expected) {
     die("failed to open %s: %s", expected_path, strerror(errno));

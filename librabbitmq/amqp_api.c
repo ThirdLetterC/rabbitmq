@@ -5,13 +5,6 @@
 #include "config.h"
 #endif
 
-#ifdef _MSC_VER
-/* MSVC complains about sprintf being deprecated in favor of sprintf_s */
-#define _CRT_SECURE_NO_WARNINGS
-/* MSVC complains about strdup being deprecated in favor of _strdup */
-#define _CRT_NONSTDC_NO_DEPRECATE
-#endif
-
 #include "amqp_private.h"
 #include "amqp_time.h"
 #include <stdarg.h>
@@ -20,8 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ERROR_MASK (0x00FF)
-#define ERROR_CATEGORY_MASK (0xFF00)
+static constexpr int error_mask = 0b0000'0000'1111'1111;
+static constexpr int error_category_mask = 0b1111'1111'0000'0000;
 
 enum error_category_enum_ { EC_base = 0, EC_tcp = 1, EC_ssl = 2 };
 
@@ -93,8 +86,8 @@ static const char *unknown_error_string = "(unknown error)";
 
 const char *amqp_error_string2(int code) {
   const char *error_string;
-  size_t category = (((-code) & ERROR_CATEGORY_MASK) >> 8);
-  size_t error = (-code) & ERROR_MASK;
+  size_t category = (((-code) & error_category_mask) >> 8);
+  size_t error = (-code) & error_mask;
 
   switch (category) {
     case EC_base:
@@ -153,9 +146,9 @@ void amqp_abort(const char *fmt, ...) {
   abort();
 }
 
-const amqp_bytes_t amqp_empty_bytes = {0, NULL};
-const amqp_table_t amqp_empty_table = {0, NULL};
-const amqp_array_t amqp_empty_array = {0, NULL};
+const amqp_bytes_t amqp_empty_bytes = {0, nullptr};
+const amqp_table_t amqp_empty_table = {0, nullptr};
+const amqp_array_t amqp_empty_array = {0, nullptr};
 
 int amqp_basic_publish(amqp_connection_state_t state, amqp_channel_t channel,
                        amqp_bytes_t exchange, amqp_bytes_t routing_key,
@@ -198,7 +191,7 @@ int amqp_basic_publish(amqp_connection_state_t state, amqp_channel_t channel,
     return res;
   }
 
-  if (properties == NULL) {
+  if (properties == nullptr) {
     memset(&default_properties, 0, sizeof(default_properties));
     properties = &default_properties;
   }
@@ -260,7 +253,13 @@ amqp_rpc_reply_t amqp_channel_close(amqp_connection_state_t state,
 
   req.reply_code = (uint16_t)code;
   req.reply_text.bytes = codestr;
-  req.reply_text.len = sprintf(codestr, "%d", code);
+  {
+    auto written = snprintf(codestr, sizeof(codestr), "%d", code);
+    if (written < 0 || (size_t)written >= sizeof(codestr)) {
+      return amqp_rpc_reply_error(AMQP_STATUS_INVALID_PARAMETER);
+    }
+    req.reply_text.len = (size_t)written;
+  }
   req.class_id = 0;
   req.method_id = 0;
 
@@ -280,7 +279,13 @@ amqp_rpc_reply_t amqp_connection_close(amqp_connection_state_t state,
 
   req.reply_code = (uint16_t)code;
   req.reply_text.bytes = codestr;
-  req.reply_text.len = sprintf(codestr, "%d", code);
+  {
+    auto written = snprintf(codestr, sizeof(codestr), "%d", code);
+    if (written < 0 || (size_t)written >= sizeof(codestr)) {
+      return amqp_rpc_reply_error(AMQP_STATUS_INVALID_PARAMETER);
+    }
+    req.reply_text.len = (size_t)written;
+  }
   req.class_id = 0;
   req.method_id = 0;
 
@@ -341,7 +346,7 @@ int amqp_set_handshake_timeout(amqp_connection_state_t state,
     state->internal_handshake_timeout = *timeout;
     state->handshake_timeout = &state->internal_handshake_timeout;
   } else {
-    state->handshake_timeout = NULL;
+    state->handshake_timeout = nullptr;
   }
 
   return AMQP_STATUS_OK;
@@ -360,7 +365,7 @@ int amqp_set_rpc_timeout(amqp_connection_state_t state,
     state->rpc_timeout = &state->internal_rpc_timeout;
     *state->rpc_timeout = *timeout;
   } else {
-    state->rpc_timeout = NULL;
+    state->rpc_timeout = nullptr;
   }
   return AMQP_STATUS_OK;
 }

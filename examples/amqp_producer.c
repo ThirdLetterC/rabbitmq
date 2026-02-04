@@ -11,7 +11,7 @@
 
 #include "utils.h"
 
-#define SUMMARY_EVERY_US 1000000
+static constexpr int summary_every_us = 1'000'000;
 
 static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
                        int rate_limit, int message_count) {
@@ -20,7 +20,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
   int sent = 0;
   int previous_sent = 0;
   uint64_t previous_report_time = start_time;
-  uint64_t next_summary_time = start_time + SUMMARY_EVERY_US;
+  uint64_t next_summary_time = start_time + summary_every_us;
 
   char message[256];
   amqp_bytes_t message_bytes;
@@ -36,7 +36,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
     uint64_t now = now_microseconds();
 
     die_on_error(amqp_basic_publish(conn, 1, amqp_literal_bytes("amq.direct"),
-                                    queue_name, 0, 0, NULL, message_bytes),
+                                    queue_name, 0, 0, nullptr, message_bytes),
                  "Publishing");
     sent++;
     if (now > next_summary_time) {
@@ -49,7 +49,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
 
       previous_sent = sent;
       previous_report_time = now;
-      next_summary_time += SUMMARY_EVERY_US;
+      next_summary_time += summary_every_us;
     }
 
     while (((i * 1000000.0) / (now - start_time)) > rate_limit) {
@@ -74,7 +74,7 @@ int main(int argc, char const *const *argv) {
   int port, status;
   int rate_limit;
   int message_count;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   if (argc < 5) {

@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-#define MAX_LINE_LENGTH 1024 * 32
+static constexpr size_t max_line_length = 32 * 1'024;
 
 static void do_publish(amqp_connection_state_t conn, char *exchange,
                        char *routing_key, amqp_basic_properties_t *props,
@@ -19,13 +19,13 @@ static void do_publish(amqp_connection_state_t conn, char *exchange,
 
 int main(int argc, const char **argv) {
   amqp_connection_state_t conn;
-  static char *exchange = NULL;
-  static char *routing_key = NULL;
-  static char *content_type = NULL;
-  static char *content_encoding = NULL;
-  static char **headers = NULL;
-  static char *reply_to = NULL;
-  static char *body = NULL;
+  static char *exchange = nullptr;
+  static char *routing_key = nullptr;
+  static char *content_type = nullptr;
+  static char *content_encoding = nullptr;
+  static char **headers = nullptr;
+  static char *reply_to = nullptr;
+  static char *body = nullptr;
   amqp_basic_properties_t props;
   amqp_bytes_t body_bytes;
   static int delivery = 1; /* non-persistent by default */
@@ -39,13 +39,13 @@ int main(int argc, const char **argv) {
       {"routing-key", 'r', POPT_ARG_STRING, &routing_key, 0,
        "the routing key to publish with", "routing key"},
       {"persistent", 'p', POPT_ARG_VAL, &delivery, 2,
-       "use the persistent delivery mode", NULL},
+       "use the persistent delivery mode", nullptr},
       {"content-type", 'C', POPT_ARG_STRING, &content_type, 0,
        "the content-type for the message", "content type"},
       {"reply-to", 't', POPT_ARG_STRING, &reply_to, 0,
        "the replyTo to use for the message", "reply to"},
       {"line-buffered", 'l', POPT_ARG_VAL, &line_buffered, 2,
-       "treat each line from standard in as a separate message", NULL},
+       "treat each line from standard in as a separate message", nullptr},
       {"content-encoding", 'E', POPT_ARG_STRING, &content_encoding, 0,
        "the content-encoding for the message", "content encoding"},
       {"header", 'H', POPT_ARG_ARGV, &headers, 0,
@@ -53,7 +53,7 @@ int main(int argc, const char **argv) {
        "\"key: value\""},
       {"body", 'b', POPT_ARG_STRING, &body, 0, "specify the message body",
        "body"},
-      POPT_AUTOHELP{NULL, '\0', 0, NULL, 0, NULL, NULL}};
+      POPT_AUTOHELP{nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
   process_all_options(argc, argv, options);
 
@@ -91,7 +91,7 @@ int main(int argc, const char **argv) {
       amqp_table_t *table = &props.headers;
       table->num_entries = num;
       table->entries = calloc(num, sizeof(amqp_table_entry_t));
-      if (table->entries == NULL) {
+      if (table->entries == nullptr) {
         fprintf(stderr, "Memory allocation failed\n");
         return 1;
       }
@@ -121,12 +121,12 @@ int main(int argc, const char **argv) {
     body_bytes = amqp_cstring_bytes(body);
   } else {
     if (line_buffered) {
-      body_bytes.bytes = (char *)malloc(MAX_LINE_LENGTH);
-      if (body_bytes.bytes == NULL) {
+      body_bytes.bytes = (char *)malloc(max_line_length);
+      if (body_bytes.bytes == nullptr) {
         fprintf(stderr, "Memory allocation failed\n");
         return 1;
       }
-      while (fgets(body_bytes.bytes, MAX_LINE_LENGTH, stdin)) {
+      while (fgets(body_bytes.bytes, max_line_length, stdin)) {
         body_bytes.len = strlen(body_bytes.bytes);
         do_publish(conn, exchange, routing_key, &props, body_bytes);
       }

@@ -17,7 +17,7 @@ int main(int argc, char const *const *argv) {
   char const *hostname;
   int port, status;
   char const *queuename;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   if (argc < 4) {
@@ -57,7 +57,7 @@ int main(int argc, char const *const *argv) {
 
     amqp_maybe_release_buffers(conn);
 
-    res = amqp_consume_message(conn, &envelope, NULL, 0);
+    res = amqp_consume_message(conn, &envelope, nullptr, 0);
 
     if (AMQP_RESPONSE_NORMAL != res.reply_type) {
       break;

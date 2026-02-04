@@ -19,14 +19,14 @@ static int do_get(amqp_connection_state_t conn, char *queue) {
 
 int main(int argc, const char **argv) {
   amqp_connection_state_t conn;
-  static char *queue = NULL;
+  static char *queue = nullptr;
   int got_something;
 
   struct poptOption options[] = {
       INCLUDE_OPTIONS(connect_options),
       {"queue", 'q', POPT_ARG_STRING, &queue, 0, "the queue to consume from",
        "queue"},
-      POPT_AUTOHELP{NULL, '\0', 0, NULL, 0, NULL, NULL}};
+      POPT_AUTOHELP{nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
   process_all_options(argc, argv, options);
 

@@ -5,24 +5,13 @@
 #define AMQP_TIMER_H
 
 #include <stdint.h>
-
-#if ((defined(_WIN32)) || (defined(__MINGW32__)) || (defined(__MINGW64__)))
-#ifndef WINVER
-#define WINVER 0x0502
-#endif
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#else
 #include <sys/time.h>
-#endif
 
-#define AMQP_MS_PER_S 1000
-#define AMQP_US_PER_MS 1000
-#define AMQP_NS_PER_S 1000000000
-#define AMQP_NS_PER_MS 1000000
-#define AMQP_NS_PER_US 1000
+static constexpr uint64_t AMQP_MS_PER_S = 1'000;
+static constexpr uint64_t AMQP_US_PER_MS = 1'000;
+static constexpr uint64_t AMQP_NS_PER_S = 1'000'000'000;
+static constexpr uint64_t AMQP_NS_PER_MS = 1'000'000;
+static constexpr uint64_t AMQP_NS_PER_US = 1'000;
 
 /* This represents a point in time in reference to a monotonic clock.
  *
@@ -44,7 +33,7 @@ typedef struct amqp_time_t_ {
 uint64_t amqp_get_monotonic_timestamp(void);
 
 /* Get a amqp_time_t that is timeout from now.
- * If timeout is NULL, an amqp_time_infinite() is created.
+ * If timeout is nullptr, an amqp_time_infinite() is created.
  *
  * Returns AMQP_STATUS_OK on success.
  * AMQP_STATUS_INVALID_PARAMETER if timeout is invalid
@@ -80,7 +69,7 @@ int amqp_time_ms_until(amqp_time_t time);
  * parameter in select().
  *
  * The in parameter specifies a storage location for *out.
- * If time is an inf timeout, then *out = NULL.
+ * If time is an inf timeout, then *out = nullptr.
  * If time is a 0-timeout or the timer has expired, then *out = {0, 0}
  * Otherwise *out is set to the time left on the time.
  *

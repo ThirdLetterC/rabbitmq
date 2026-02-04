@@ -13,9 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define INITIAL_ARRAY_SIZE 16
-#define INITIAL_TABLE_SIZE 16
-#define TABLE_DEPTH_LIMIT 100
+static constexpr int initial_array_size = 16;
+static constexpr int initial_table_size = 16;
+static constexpr int table_depth_limit = 100;
 
 static int amqp_decode_field_value(amqp_bytes_t encoded, amqp_pool_t *pool,
                                    amqp_field_value_t *entry, size_t *offset,
@@ -30,7 +30,7 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
                              amqp_array_t *output, size_t *offset, int depth) {
   uint32_t arraysize;
   int num_entries = 0;
-  int allocated_entries = INITIAL_ARRAY_SIZE;
+  int allocated_entries = initial_array_size;
   amqp_field_value_t *entries;
   size_t limit;
   int res;
@@ -44,7 +44,7 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
   }
 
   entries = malloc(allocated_entries * sizeof(amqp_field_value_t));
-  if (entries == NULL) {
+  if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
@@ -56,7 +56,7 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
       newentries =
           realloc(entries, allocated_entries * sizeof(amqp_field_value_t));
       res = AMQP_STATUS_NO_MEMORY;
-      if (newentries == NULL) {
+      if (newentries == nullptr) {
         goto out;
       }
 
@@ -75,8 +75,8 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
   output->num_entries = num_entries;
   output->entries =
       amqp_pool_alloc(pool, num_entries * sizeof(amqp_field_value_t));
-  /* NULL is legitimate if we requested a zero-length block. */
-  if (output->entries == NULL) {
+  /* nullptr is legitimate if we requested a zero-length block. */
+  if (output->entries == nullptr) {
     if (num_entries == 0) {
       res = AMQP_STATUS_OK;
     } else {
@@ -99,7 +99,7 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
   uint32_t tablesize;
   int num_entries = 0;
   amqp_table_entry_t *entries;
-  int allocated_entries = INITIAL_TABLE_SIZE;
+  int allocated_entries = initial_table_size;
   size_t limit;
   int res;
 
@@ -112,7 +112,7 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
   }
 
   entries = malloc(allocated_entries * sizeof(amqp_table_entry_t));
-  if (entries == NULL) {
+  if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
@@ -131,7 +131,7 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
       newentries =
           realloc(entries, allocated_entries * sizeof(amqp_table_entry_t));
       res = AMQP_STATUS_NO_MEMORY;
-      if (newentries == NULL) {
+      if (newentries == nullptr) {
         goto out;
       }
 
@@ -156,8 +156,8 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
   output->num_entries = num_entries;
   output->entries =
       amqp_pool_alloc(pool, num_entries * sizeof(amqp_table_entry_t));
-  /* NULL is legitimate if we requested a zero-length block. */
-  if (output->entries == NULL) {
+  /* nullptr is legitimate if we requested a zero-length block. */
+  if (output->entries == nullptr) {
     if (num_entries == 0) {
       res = AMQP_STATUS_OK;
     } else {
@@ -184,7 +184,7 @@ static int amqp_decode_field_value(amqp_bytes_t encoded, amqp_pool_t *pool,
                                    int depth) {
   int res = AMQP_STATUS_BAD_AMQP_DATA;
 
-  if (depth > TABLE_DEPTH_LIMIT) {
+  if (depth > table_depth_limit) {
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
@@ -521,7 +521,7 @@ static int amqp_field_value_clone(const amqp_field_value_t *original,
       } else {
         amqp_pool_alloc_bytes(pool, original->value.bytes.len,
                               &clone->value.bytes);
-        if (NULL == clone->value.bytes.bytes) {
+        if (nullptr == clone->value.bytes.bytes) {
           return AMQP_STATUS_NO_MEMORY;
         }
         memcpy(clone->value.bytes.bytes, original->value.bytes.bytes,
@@ -536,7 +536,7 @@ static int amqp_field_value_clone(const amqp_field_value_t *original,
         clone->value.array.num_entries = original->value.array.num_entries;
         clone->value.array.entries = amqp_pool_alloc(
             pool, clone->value.array.num_entries * sizeof(amqp_field_value_t));
-        if (NULL == clone->value.array.entries) {
+        if (nullptr == clone->value.array.entries) {
           return AMQP_STATUS_NO_MEMORY;
         }
 
@@ -572,7 +572,7 @@ static int amqp_table_entry_clone(const amqp_table_entry_t *original,
   }
 
   amqp_pool_alloc_bytes(pool, original->key.len, &clone->key);
-  if (NULL == clone->key.bytes) {
+  if (nullptr == clone->key.bytes) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
@@ -594,7 +594,7 @@ int amqp_table_clone(const amqp_table_t *original, amqp_table_t *clone,
   clone->entries =
       amqp_pool_alloc(pool, clone->num_entries * sizeof(amqp_table_entry_t));
 
-  if (NULL == clone->entries) {
+  if (nullptr == clone->entries) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
@@ -642,11 +642,11 @@ amqp_table_entry_t amqp_table_construct_bool_entry(const char *key,
 amqp_table_entry_t *amqp_table_get_entry_by_key(const amqp_table_t *table,
                                                 const amqp_bytes_t key) {
   int i;
-  assert(table != NULL);
+  assert(table != nullptr);
   for (i = 0; i < table->num_entries; ++i) {
     if (amqp_bytes_equal(table->entries[i].key, key)) {
       return &table->entries[i];
     }
   }
-  return NULL;
+  return nullptr;
 }

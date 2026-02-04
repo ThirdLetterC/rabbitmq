@@ -12,19 +12,9 @@
 
 #include "utils.h"
 
-#if ((defined(_WIN32)) || (defined(__MINGW32__)) || (defined(__MINGW64__)))
-#ifndef WINVER
-#define WINVER 0x0502
-#endif
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#else
 #include <sys/time.h>
-#endif
 
-#define SUMMARY_EVERY_US 5000
+static constexpr int summary_every_us = 5'000;
 
 static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
                        int rate_limit, int message_count) {
@@ -33,7 +23,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
   int sent = 0;
   int previous_sent = 0;
   uint64_t previous_report_time = start_time;
-  uint64_t next_summary_time = start_time + SUMMARY_EVERY_US;
+  uint64_t next_summary_time = start_time + summary_every_us;
 
   char message[256];
   amqp_bytes_t message_bytes;
@@ -49,7 +39,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
     uint64_t now = now_microseconds();
 
     die_on_error(amqp_basic_publish(conn, 1, amqp_literal_bytes("amq.direct"),
-                                    queue_name, 0, 0, NULL, message_bytes),
+                                    queue_name, 0, 0, nullptr, message_bytes),
                  "Publishing");
     sent++;
     if (now > next_summary_time) {
@@ -62,7 +52,7 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
 
       previous_sent = sent;
       previous_report_time = now;
-      next_summary_time += SUMMARY_EVERY_US;
+      next_summary_time += summary_every_us;
     }
 
     while (((i * 1000000.0) / (now - start_time)) > rate_limit) {
@@ -82,11 +72,11 @@ static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
   }
 }
 
-#define CONSUME_TIMEOUT_USEC 100
-#define WAITING_TIMEOUT_USEC (30 * 1000)
+static constexpr int consume_timeout_usec = 100;
+static constexpr int waiting_timeout_usec = 30 * 1'000;
 void wait_for_acks(amqp_connection_state_t conn) {
   uint64_t start_time = now_microseconds();
-  struct timeval timeout = {0, CONSUME_TIMEOUT_USEC};
+  struct timeval timeout = {0, consume_timeout_usec};
   uint64_t now = 0;
   amqp_publisher_confirm_t result = {};
 
@@ -95,7 +85,7 @@ void wait_for_acks(amqp_connection_state_t conn) {
 
     now = now_microseconds();
 
-    if (now > start_time + WAITING_TIMEOUT_USEC) {
+    if (now > start_time + waiting_timeout_usec) {
       return;
     }
 
@@ -140,7 +130,7 @@ int main(int argc, char const *const *argv) {
   int port, status;
   int rate_limit;
   int message_count;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   if (argc < 5) {

@@ -5,10 +5,6 @@
 #include "config.h"
 #endif
 
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include "amqp_private.h"
 #include <limits.h>
 #include <stdint.h>
@@ -83,7 +79,7 @@ int amqp_parse_url(char *url, struct amqp_connection_info *parsed) {
   char delim;
   char *start;
   char *host;
-  char *port = NULL;
+  char *port = nullptr;
 
   amqp_default_connection_info(parsed);
 
@@ -116,7 +112,7 @@ int amqp_parse_url(char *url, struct amqp_connection_info *parsed) {
       parsed->password = port;
     }
 
-    port = NULL;
+    port = nullptr;
     host = start = url;
     delim = find_delim(&url, 1);
   }

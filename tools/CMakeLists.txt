@@ -1,21 +1,18 @@
 # Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 # SPDX-License-Identifier: mit
 
-if(WIN32)
-  set(PLATFORM_DIR win32)
-else()
-  set(PLATFORM_DIR unix)
-endif()
+set(PLATFORM_DIR unix)
+set(RMQ_C_WARNING_FLAGS -Wall -Wextra -Wpedantic -Werror)
 
 add_library(tools-common OBJECT)
 target_sources(tools-common PRIVATE
   common.h
   common.c)
-if(WIN32)
-  target_sources(tools-common PRIVATE 
-  win32/compat.h
-  win32/compat.c)
-endif()
+set_target_properties(tools-common PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(tools-common PRIVATE ${RMQ_C_WARNING_FLAGS})
 if(ENABLE_SSL_SUPPORT)
   target_compile_definitions(tools-common PRIVATE -DWITH_SSL=1)
 endif()
@@ -24,19 +21,44 @@ target_link_libraries(tools-common PRIVATE rabbitmq::rabbitmq PUBLIC popt::popt)
 
 add_executable(amqp-publish publish.c)
 target_link_libraries(amqp-publish PRIVATE tools-common rabbitmq::rabbitmq)
+set_target_properties(amqp-publish PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(amqp-publish PRIVATE ${RMQ_C_WARNING_FLAGS})
 
 add_executable(amqp-get get.c)
 target_link_libraries(amqp-get PRIVATE tools-common rabbitmq::rabbitmq)
+set_target_properties(amqp-get PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(amqp-get PRIVATE ${RMQ_C_WARNING_FLAGS})
 
 add_executable(amqp-consume consume.c ${PLATFORM_DIR}/process.h ${PLATFORM_DIR}/process.c)
 target_include_directories(amqp-consume PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${PLATFORM_DIR})
 target_link_libraries(amqp-consume PRIVATE tools-common rabbitmq::rabbitmq)
+set_target_properties(amqp-consume PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(amqp-consume PRIVATE ${RMQ_C_WARNING_FLAGS})
 
 add_executable(amqp-declare-queue declare_queue.c)
 target_link_libraries(amqp-declare-queue PRIVATE tools-common rabbitmq::rabbitmq)
+set_target_properties(amqp-declare-queue PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(amqp-declare-queue PRIVATE ${RMQ_C_WARNING_FLAGS})
 
 add_executable(amqp-delete-queue delete_queue.c)
 target_link_libraries(amqp-delete-queue PRIVATE tools-common rabbitmq::rabbitmq)
+set_target_properties(amqp-delete-queue PROPERTIES
+  C_STANDARD 23
+  C_STANDARD_REQUIRED YES
+  C_EXTENSIONS NO)
+target_compile_options(amqp-delete-queue PRIVATE ${RMQ_C_WARNING_FLAGS})
 
 install(TARGETS amqp-publish amqp-get amqp-consume amqp-declare-queue amqp-delete-queue
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

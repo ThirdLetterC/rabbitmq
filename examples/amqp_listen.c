@@ -18,7 +18,7 @@ int main(int argc, char const *const *argv) {
   int port, status;
   char const *exchange;
   char const *bindingkey;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   amqp_bytes_t queuename;
@@ -56,7 +56,7 @@ int main(int argc, char const *const *argv) {
         conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue");
     queuename = amqp_bytes_malloc_dup(r->queue);
-    if (queuename.bytes == NULL) {
+    if (queuename.bytes == nullptr) {
       fprintf(stderr, "Out of memory while copying queue name");
       return 1;
     }
@@ -77,7 +77,7 @@ int main(int argc, char const *const *argv) {
 
       amqp_maybe_release_buffers(conn);
 
-      res = amqp_consume_message(conn, &envelope, NULL, 0);
+      res = amqp_consume_message(conn, &envelope, nullptr, 0);
 
       if (AMQP_RESPONSE_NORMAL != res.reply_type) {
         break;

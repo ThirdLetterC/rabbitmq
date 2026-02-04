@@ -7,40 +7,11 @@
 #include <limits.h>
 #include <string.h>
 
-#if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || \
-     defined(__MINGW32__) || defined(__MINGW64__))
-#define AMQP_WIN_TIMER_API
-#elif (defined(machintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
+#if (defined(machintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
 #define AMQP_MAC_TIMER_API
 #else
 #define AMQP_POSIX_TIMER_API
 #endif
-
-#ifdef AMQP_WIN_TIMER_API
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-
-uint64_t amqp_get_monotonic_timestamp(void) {
-  static double NS_PER_COUNT = 0;
-  LARGE_INTEGER perf_count;
-
-  if (0 == NS_PER_COUNT) {
-    LARGE_INTEGER perf_frequency;
-    if (!QueryPerformanceFrequency(&perf_frequency)) {
-      return 0;
-    }
-    NS_PER_COUNT = (double)AMQP_NS_PER_S / perf_frequency.QuadPart;
-  }
-
-  if (!QueryPerformanceCounter(&perf_count)) {
-    return 0;
-  }
-
-  return (uint64_t)(perf_count.QuadPart * NS_PER_COUNT);
-}
-#endif /* AMQP_WIN_TIMER_API */
 
 #ifdef AMQP_MAC_TIMER_API
 #include <mach/mach_time.h>
@@ -86,9 +57,9 @@ int amqp_time_from_now(amqp_time_t *time, const struct timeval *timeout) {
   uint64_t now_ns;
   uint64_t delta_ns;
 
-  assert(NULL != time);
+  assert(nullptr != time);
 
-  if (NULL == timeout) {
+  if (nullptr == timeout) {
     *time = amqp_time_infinite();
     return AMQP_STATUS_OK;
   }
@@ -116,7 +87,7 @@ int amqp_time_from_now(amqp_time_t *time, const struct timeval *timeout) {
 int amqp_time_s_from_now(amqp_time_t *time, int seconds) {
   uint64_t now_ns;
   uint64_t delta_ns;
-  assert(NULL != time);
+  assert(nullptr != time);
 
   if (0 >= seconds) {
     *time = amqp_time_infinite();
@@ -175,9 +146,9 @@ int amqp_time_tv_until(amqp_time_t time, struct timeval *in,
   uint64_t now_ns;
   uint64_t delta_ns;
 
-  assert(in != NULL);
+  assert(in != nullptr);
   if (UINT64_MAX == time.time_point_ns) {
-    *out = NULL;
+    *out = nullptr;
     return AMQP_STATUS_OK;
   }
   if (0 == time.time_point_ns) {

@@ -8,47 +8,16 @@
 #include "config.h"
 #endif
 
-#define AMQ_COPYRIGHT                                       \
-  "Copyright (c) 2007-2014 VMWare Inc, Tony Garnock-Jones," \
-  " and Alan Antonuk."
+static constexpr char AMQ_COPYRIGHT[] =
+    "Copyright (c) 2007-2014 VMWare Inc, Tony Garnock-Jones,"
+    " and Alan Antonuk.";
 
 #include "rabbitmq-c/amqp.h"
 #include "rabbitmq-c/framing.h"
 #include <string.h>
 
-#if ((defined(_WIN32)) || (defined(__MINGW32__)) || (defined(__MINGW64__)))
-#ifndef WINVER
-/* WINVER 0x0502 is WinXP SP2+, Windows Server 2003 SP1+
- * See:
- * http://msdn.microsoft.com/en-us/library/windows/desktop/aa383745(v=vs.85).aspx#macros_for_conditional_declarations
- */
-#define WINVER 0x0502
-#endif
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#else
 #include <arpa/inet.h>
 #include <sys/uio.h>
-#endif
-
-/* GCC attributes */
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
-#define AMQP_NORETURN __attribute__((__noreturn__))
-#define AMQP_UNUSED __attribute__((__unused__))
-#elif defined(_MSC_VER)
-#define AMQP_NORETURN __declspec(noreturn)
-#define AMQP_UNUSED __pragma(warning(suppress : 4100))
-#else
-#define AMQP_NORETURN
-#define AMQP_UNUSED
-#endif
-
-#if (defined(_MSC_VER) && (_MSC_VER <= 1800)) || \
-    (defined(__BORLANDC__) && (__BORLANDC__ <= 0x0564))
-#define inline __inline
-#endif
 
 char *amqp_os_error_string(int err);
 
@@ -65,7 +34,7 @@ char *amqp_os_error_string(int err);
  * - CONNECTION_STATE_IDLE: The normal state between
  *   frames. Connections may only be reconfigured, and the
  *   connection's pools recycled, when in this state. Whenever we're
- *   in this state, the inbound_buffer's bytes pointer must be NULL;
+ *   in this state, the inbound_buffer's bytes pointer must be nullptr;
  *   any other state, and it must point to a block of memory allocated
  *   from the frame_pool.
  *
@@ -93,17 +62,18 @@ typedef enum amqp_status_private_enum_ {
 } amqp_status_private_enum;
 
 /* 7 bytes up front, then payload, then 1 byte footer */
-#define HEADER_SIZE 7
-#define FOOTER_SIZE 1
+static constexpr size_t HEADER_SIZE = 7;
+static constexpr size_t FOOTER_SIZE = 1;
 
-#define AMQP_PSEUDOFRAME_PROTOCOL_HEADER 'A'
+static constexpr uint8_t AMQP_PSEUDOFRAME_PROTOCOL_HEADER =
+    (uint8_t)'A';
 
 typedef struct amqp_link_t_ {
   struct amqp_link_t_ *next;
   void *data;
 } amqp_link_t;
 
-#define POOL_TABLE_SIZE 16
+static constexpr size_t POOL_TABLE_SIZE = 16;
 
 typedef struct amqp_pool_table_entry_t_ {
   struct amqp_pool_table_entry_t_ *next;
@@ -292,8 +262,8 @@ DECLARE_CODEC_BASE_TYPE(64)
 static inline int amqp_encode_bytes(amqp_bytes_t encoded, size_t *offset,
                                     amqp_bytes_t input) {
   size_t o = *offset;
-  /* The memcpy below has undefined behavior if the input is NULL. It is valid
-   * for a 0-length amqp_bytes_t to have .bytes == NULL. Thus we should check
+  /* The memcpy below has undefined behavior if the input is nullptr. It is valid
+   * for a 0-length amqp_bytes_t to have .bytes == nullptr. Thus we should check
    * before encoding.
    */
   if (input.len == 0) {
@@ -319,8 +289,7 @@ static inline int amqp_decode_bytes(amqp_bytes_t encoded, size_t *offset,
   }
 }
 
-AMQP_NORETURN
-void amqp_abort(const char *fmt, ...);
+[[noreturn]] void amqp_abort(const char *fmt, ...);
 
 int amqp_bytes_equal(amqp_bytes_t r, amqp_bytes_t l);
 

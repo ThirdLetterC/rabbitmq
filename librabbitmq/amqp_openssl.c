@@ -5,10 +5,6 @@
 #include "config.h"
 #endif
 
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 // Use OpenSSL v1.1.1 API.
 #define OPENSSL_API_COMPAT 10101
 
@@ -40,7 +36,7 @@ static pthread_mutex_t openssl_init_mutex = PTHREAD_MUTEX_INITIALIZER;
 static amqp_boolean_t openssl_bio_initialized = 0;
 static int openssl_connections = 0;
 #ifdef ENABLE_SSL_ENGINE_API
-static ENGINE *openssl_engine = NULL;
+static ENGINE *openssl_engine = nullptr;
 #endif
 
 #define CHECK_SUCCESS(condition)                                            \
@@ -63,7 +59,7 @@ struct amqp_ssl_socket_t {
 };
 
 static ssize_t amqp_ssl_socket_send(void *base, const void *buf, size_t len,
-                                    AMQP_UNUSED int flags) {
+                                    [[maybe_unused]] int flags) {
   struct amqp_ssl_socket_t *self = (struct amqp_ssl_socket_t *)base;
   int res;
   if (-1 == self->sockfd) {
@@ -108,7 +104,7 @@ static ssize_t amqp_ssl_socket_send(void *base, const void *buf, size_t len,
 }
 
 static ssize_t amqp_ssl_socket_recv(void *base, void *buf, size_t len,
-                                    AMQP_UNUSED int flags) {
+                                    [[maybe_unused]] int flags) {
   struct amqp_ssl_socket_t *self = (struct amqp_ssl_socket_t *)base;
   int received;
   if (-1 == self->sockfd) {
@@ -243,7 +239,7 @@ start_connect:
     }
 
     if (1 != X509_check_host(cert, host, strlen(host),
-                             X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS, NULL)) {
+                             X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS, nullptr)) {
       self->internal_error = 0;
       status = AMQP_STATUS_SSL_HOSTNAME_VERIFY_FAILED;
       goto error_out4;
@@ -266,7 +262,7 @@ error_out2:
   self->sockfd = -1;
 error_out1:
   SSL_free(self->ssl);
-  self->ssl = NULL;
+  self->ssl = nullptr;
   goto exit;
 }
 
@@ -283,7 +279,7 @@ static int amqp_ssl_socket_close(void *base, amqp_socket_close_enum force) {
   }
 
   SSL_free(self->ssl);
-  self->ssl = NULL;
+  self->ssl = nullptr;
 
   if (amqp_os_socket_close(self->sockfd)) {
     return AMQP_STATUS_SOCKET_ERROR;
@@ -323,7 +319,7 @@ amqp_socket_t *amqp_ssl_socket_new(amqp_connection_state_t state) {
   struct amqp_ssl_socket_t *self = calloc(1, sizeof(*self));
   int status;
   if (!self) {
-    return NULL;
+    return nullptr;
   }
 
   self->sockfd = -1;
@@ -356,7 +352,7 @@ amqp_socket_t *amqp_ssl_socket_new(amqp_connection_state_t state) {
   return (amqp_socket_t *)self;
 error:
   amqp_ssl_socket_delete((amqp_socket_t *)self);
-  return NULL;
+  return nullptr;
 }
 
 void *amqp_ssl_socket_get_context(amqp_socket_t *base) {
@@ -387,7 +383,7 @@ int amqp_ssl_socket_set_cacert(amqp_socket_t *base, const char *cacert) {
     amqp_abort("<%p> is not of type amqp_ssl_socket_t", base);
   }
   self = (struct amqp_ssl_socket_t *)base;
-  status = SSL_CTX_load_verify_locations(self->ctx, cacert, NULL);
+  status = SSL_CTX_load_verify_locations(self->ctx, cacert, nullptr);
   if (1 != status) {
     return AMQP_STATUS_SSL_ERROR;
   }
@@ -418,7 +414,7 @@ int amqp_ssl_socket_set_key_engine(amqp_socket_t *base, const char *cert,
 #ifdef ENABLE_SSL_ENGINE_API
   int status;
   struct amqp_ssl_socket_t *self;
-  EVP_PKEY *pkey = NULL;
+  EVP_PKEY *pkey = nullptr;
   if (base->klass != &amqp_ssl_socket_class) {
     amqp_abort("<%p> is not of type amqp_ssl_socket_t", base);
   }
@@ -428,8 +424,8 @@ int amqp_ssl_socket_set_key_engine(amqp_socket_t *base, const char *cert,
     return AMQP_STATUS_SSL_ERROR;
   }
 
-  pkey = ENGINE_load_private_key(openssl_engine, key, NULL, NULL);
-  if (pkey == NULL) {
+  pkey = ENGINE_load_private_key(openssl_engine, key, nullptr, nullptr);
+  if (pkey == nullptr) {
     return AMQP_STATUS_SSL_ERROR;
   }
 
@@ -445,16 +441,18 @@ int amqp_ssl_socket_set_key_engine(amqp_socket_t *base, const char *cert,
 #endif
 }
 
-static int password_cb(AMQP_UNUSED char *buffer, AMQP_UNUSED int length,
-                       AMQP_UNUSED int rwflag, AMQP_UNUSED void *user_data) {
+static int password_cb([[maybe_unused]] char *buffer,
+                       [[maybe_unused]] int length,
+                       [[maybe_unused]] int rwflag,
+                       [[maybe_unused]] void *user_data) {
   amqp_abort("rabbitmq-c does not support password protected keys");
 }
 
 int amqp_ssl_socket_set_key_buffer(amqp_socket_t *base, const char *cert,
                                    const void *key, size_t n) {
   int status = AMQP_STATUS_OK;
-  BIO *buf = NULL;
-  RSA *rsa = NULL;
+  BIO *buf = nullptr;
+  RSA *rsa = nullptr;
   struct amqp_ssl_socket_t *self;
   if (base->klass != &amqp_ssl_socket_class) {
     amqp_abort("<%p> is not of type amqp_ssl_socket_t", base);
@@ -471,7 +469,7 @@ int amqp_ssl_socket_set_key_buffer(amqp_socket_t *base, const char *cert,
   if (!buf) {
     goto error;
   }
-  rsa = PEM_read_bio_RSAPrivateKey(buf, NULL, password_cb, NULL);
+  rsa = PEM_read_bio_RSAPrivateKey(buf, nullptr, password_cb, nullptr);
   if (!rsa) {
     goto error;
   }
@@ -600,25 +598,25 @@ int amqp_set_ssl_engine(const char *engine) {
   int status = AMQP_STATUS_OK;
   CHECK_SUCCESS(pthread_mutex_lock(&openssl_init_mutex));
 
-  if (openssl_engine != NULL) {
+  if (openssl_engine != nullptr) {
     ENGINE_free(openssl_engine);
-    openssl_engine = NULL;
+    openssl_engine = nullptr;
   }
 
-  if (engine == NULL) {
+  if (engine == nullptr) {
     goto out;
   }
 
   ENGINE_load_builtin_engines();
   openssl_engine = ENGINE_by_id(engine);
-  if (openssl_engine == NULL) {
+  if (openssl_engine == nullptr) {
     status = AMQP_STATUS_SSL_SET_ENGINE_FAILED;
     goto out;
   }
 
   if (ENGINE_set_default(openssl_engine, ENGINE_METHOD_ALL) == 0) {
     ENGINE_free(openssl_engine);
-    openssl_engine = NULL;
+    openssl_engine = nullptr;
     status = AMQP_STATUS_SSL_SET_ENGINE_FAILED;
     goto out;
   }

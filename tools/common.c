@@ -14,14 +14,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef WINDOWS
-#include "compat.h"
-#endif
-
 /* For when reading auth data from a file */
-#define MAXAUTHTOKENLEN 128
-#define USERNAMEPREFIX "username:"
-#define PASSWORDPREFIX "password:"
+static constexpr size_t max_auth_token_len = 128;
+static constexpr char username_prefix[] = "username:";
+static constexpr char password_prefix[] = "password:";
 
 void die(const char *fmt, ...) {
   va_list ap;
@@ -87,7 +83,7 @@ const char *amqp_server_exception_string(amqp_rpc_reply_t r) {
       break;
   }
 
-  return res >= 0 ? s : NULL;
+  return res >= 0 ? s : nullptr;
 }
 
 const char *amqp_rpc_reply_string(amqp_rpc_reply_t r) {
@@ -134,8 +130,8 @@ static char *amqp_authfile;
 #ifdef WITH_SSL
 static int amqp_ssl = 0;
 static char *amqp_cacert = "/etc/ssl/certs/cacert.pem";
-static char *amqp_key = NULL;
-static char *amqp_cert = NULL;
+static char *amqp_key = nullptr;
+static char *amqp_cert = nullptr;
 #endif /* WITH_SSL */
 
 const char *connect_options_title = "Connection options";
@@ -156,7 +152,7 @@ struct poptOption connect_options[] = {
     {"authfile", 0, POPT_ARG_STRING, &amqp_authfile, 0,
      "path to file containing username/password for authentication", "file"},
 #ifdef WITH_SSL
-    {"ssl", 0, POPT_ARG_NONE, &amqp_ssl, 0, "connect over SSL/TLS", NULL},
+    {"ssl", 0, POPT_ARG_NONE, &amqp_ssl, 0, "connect over SSL/TLS", nullptr},
     {"cacert", 0, POPT_ARG_STRING, &amqp_cacert, 0,
      "path to the CA certificate file", "cacert.pem"},
     {"key", 0, POPT_ARG_STRING, &amqp_key, 0,
@@ -164,25 +160,25 @@ struct poptOption connect_options[] = {
     {"cert", 0, POPT_ARG_STRING, &amqp_cert, 0,
      "path to the client certificate file", "cert.pem"},
 #endif /* WITH_SSL */
-    {NULL, '\0', 0, NULL, 0, NULL, NULL}};
+    {nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
 void read_authfile(const char *path) {
   size_t n;
-  FILE *fp = NULL;
-  char token[MAXAUTHTOKENLEN];
+  FILE *fp = nullptr;
+  char token[max_auth_token_len];
 
-  if ((amqp_username = malloc(MAXAUTHTOKENLEN)) == NULL ||
-      (amqp_password = malloc(MAXAUTHTOKENLEN)) == NULL) {
+  if ((amqp_username = malloc(max_auth_token_len)) == nullptr ||
+      (amqp_password = malloc(max_auth_token_len)) == nullptr) {
     die("Out of memory");
-  } else if ((fp = fopen(path, "r")) == NULL) {
+  } else if ((fp = fopen(path, "r")) == nullptr) {
     die("Could not read auth data file %s", path);
   }
 
-  if (fgets(token, MAXAUTHTOKENLEN, fp) == NULL ||
-      strncmp(token, USERNAMEPREFIX, strlen(USERNAMEPREFIX))) {
+  if (fgets(token, max_auth_token_len, fp) == nullptr ||
+      strncmp(token, username_prefix, strlen(username_prefix))) {
     die("Malformed auth file (missing username)");
   }
-  strncpy(amqp_username, &token[strlen(USERNAMEPREFIX)], MAXAUTHTOKENLEN);
+  strncpy(amqp_username, &token[strlen(username_prefix)], max_auth_token_len);
   /* Missing newline means token was cut off */
   n = strlen(amqp_username);
   if (amqp_username[n - 1] != '\n') {
@@ -191,11 +187,11 @@ void read_authfile(const char *path) {
     amqp_username[n - 1] = '\0';
   }
 
-  if (fgets(token, MAXAUTHTOKENLEN, fp) == NULL ||
-      strncmp(token, PASSWORDPREFIX, strlen(PASSWORDPREFIX))) {
+  if (fgets(token, max_auth_token_len, fp) == nullptr ||
+      strncmp(token, password_prefix, strlen(password_prefix))) {
     die("Malformed auth file (missing password)");
   }
-  strncpy(amqp_password, &token[strlen(PASSWORDPREFIX)], MAXAUTHTOKENLEN);
+  strncpy(amqp_password, &token[strlen(password_prefix)], max_auth_token_len);
   /* Missing newline means token was cut off */
   n = strlen(amqp_password);
   if (amqp_password[n - 1] != '\n') {
@@ -212,12 +208,12 @@ void read_authfile(const char *path) {
 }
 
 static void init_connection_info(struct amqp_connection_info *ci) {
-  ci->user = NULL;
-  ci->password = NULL;
-  ci->host = NULL;
+  ci->user = nullptr;
+  ci->password = nullptr;
+  ci->host = nullptr;
   ci->port = -1;
-  ci->vhost = NULL;
-  ci->user = NULL;
+  ci->vhost = nullptr;
+  ci->user = nullptr;
 
   amqp_default_connection_info(ci);
 
@@ -332,7 +328,7 @@ static void init_connection_info(struct amqp_connection_info *ci) {
 
 amqp_connection_state_t make_connection(void) {
   int status;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   struct amqp_connection_info ci;
   amqp_connection_state_t conn;
 
@@ -451,7 +447,7 @@ void copy_body(amqp_connection_state_t conn, int fd) {
 poptContext process_options(int argc, const char **argv,
                             struct poptOption *options, const char *help) {
   int c;
-  poptContext opts = poptGetContext(NULL, argc, argv, options, 0);
+  poptContext opts = poptGetContext(nullptr, argc, argv, options, 0);
   poptSetOtherOptionHelp(opts, help);
 
   while ((c = poptGetNextOpt(opts)) >= 0) {

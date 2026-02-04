@@ -21,33 +21,33 @@ void init_amqp_pool(amqp_pool_t *pool, size_t pagesize) {
   pool->pagesize = pagesize ? pagesize : 4096;
 
   pool->pages.num_blocks = 0;
-  pool->pages.blocklist = NULL;
+  pool->pages.blocklist = nullptr;
 
   pool->large_blocks.num_blocks = 0;
-  pool->large_blocks.blocklist = NULL;
+  pool->large_blocks.blocklist = nullptr;
 
   pool->next_page = 0;
-  pool->alloc_block = NULL;
+  pool->alloc_block = nullptr;
   pool->alloc_used = 0;
 }
 
 static void empty_blocklist(amqp_pool_blocklist_t *x) {
   int i;
 
-  if (x->blocklist != NULL) {
+  if (x->blocklist != nullptr) {
     for (i = 0; i < x->num_blocks; i++) {
       free(x->blocklist[i]);
     }
     free(x->blocklist);
   }
   x->num_blocks = 0;
-  x->blocklist = NULL;
+  x->blocklist = nullptr;
 }
 
 void recycle_amqp_pool(amqp_pool_t *pool) {
   empty_blocklist(&pool->large_blocks);
   pool->next_page = 0;
-  pool->alloc_block = NULL;
+  pool->alloc_block = nullptr;
   pool->alloc_used = 0;
 }
 
@@ -60,14 +60,14 @@ void empty_amqp_pool(amqp_pool_t *pool) {
 static int record_pool_block(amqp_pool_blocklist_t *x, void *block) {
   size_t blocklistlength = sizeof(void *) * (x->num_blocks + 1);
 
-  if (x->blocklist == NULL) {
+  if (x->blocklist == nullptr) {
     x->blocklist = malloc(blocklistlength);
-    if (x->blocklist == NULL) {
+    if (x->blocklist == nullptr) {
       return 0;
     }
   } else {
     void *newbl = realloc(x->blocklist, blocklistlength);
-    if (newbl == NULL) {
+    if (newbl == nullptr) {
       return 0;
     }
     x->blocklist = newbl;
@@ -80,24 +80,24 @@ static int record_pool_block(amqp_pool_blocklist_t *x, void *block) {
 
 void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
   if (amount == 0) {
-    return NULL;
+    return nullptr;
   }
 
   amount = (amount + 7) & (~7); /* round up to nearest 8-byte boundary */
 
   if (amount > pool->pagesize) {
     void *result = calloc(1, amount);
-    if (result == NULL) {
-      return NULL;
+    if (result == nullptr) {
+      return nullptr;
     }
     if (!record_pool_block(&pool->large_blocks, result)) {
       free(result);
-      return NULL;
+      return nullptr;
     }
     return result;
   }
 
-  if (pool->alloc_block != NULL) {
+  if (pool->alloc_block != nullptr) {
     assert(pool->alloc_used <= pool->pagesize);
 
     if (pool->alloc_used + amount <= pool->pagesize) {
@@ -109,11 +109,11 @@ void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
 
   if (pool->next_page >= pool->pages.num_blocks) {
     pool->alloc_block = calloc(1, pool->pagesize);
-    if (pool->alloc_block == NULL) {
-      return NULL;
+    if (pool->alloc_block == nullptr) {
+      return nullptr;
     }
     if (!record_pool_block(&pool->pages, pool->alloc_block)) {
-      return NULL;
+      return nullptr;
     }
     pool->next_page = pool->pages.num_blocks;
   } else {
@@ -143,7 +143,7 @@ amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
   amqp_bytes_t result;
   result.len = src.len;
   result.bytes = malloc(src.len);
-  if (result.bytes != NULL) {
+  if (result.bytes != nullptr) {
     memcpy(result.bytes, src.bytes, src.len);
   }
   return result;
@@ -152,7 +152,7 @@ amqp_bytes_t amqp_bytes_malloc_dup(amqp_bytes_t src) {
 amqp_bytes_t amqp_bytes_malloc(size_t amount) {
   amqp_bytes_t result;
   result.len = amount;
-  result.bytes = malloc(amount); /* will return NULL if it fails */
+  result.bytes = malloc(amount); /* will return nullptr if it fails */
   return result;
 }
 
@@ -165,15 +165,15 @@ amqp_pool_t *amqp_get_or_create_channel_pool(amqp_connection_state_t state,
 
   entry = state->pool_table[index];
 
-  for (; NULL != entry; entry = entry->next) {
+  for (; nullptr != entry; entry = entry->next) {
     if (channel == entry->channel) {
       return &entry->pool;
     }
   }
 
   entry = malloc(sizeof(amqp_pool_table_entry_t));
-  if (NULL == entry) {
-    return NULL;
+  if (nullptr == entry) {
+    return nullptr;
   }
 
   entry->channel = channel;
@@ -192,13 +192,13 @@ amqp_pool_t *amqp_get_channel_pool(amqp_connection_state_t state,
 
   entry = state->pool_table[index];
 
-  for (; NULL != entry; entry = entry->next) {
+  for (; nullptr != entry; entry = entry->next) {
     if (channel == entry->channel) {
       return &entry->pool;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 int amqp_bytes_equal(amqp_bytes_t r, amqp_bytes_t l) {

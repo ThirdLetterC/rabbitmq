@@ -10,7 +10,7 @@
 
 int main(int argc, const char **argv) {
   amqp_connection_state_t conn;
-  static char *queue = NULL;
+  static char *queue = nullptr;
   static int durable = 0;
 
   struct poptOption options[] = {
@@ -18,12 +18,12 @@ int main(int argc, const char **argv) {
       {"queue", 'q', POPT_ARG_STRING, &queue, 0,
        "the queue name to declare, or the empty string", "queue"},
       {"durable", 'd', POPT_ARG_VAL, &durable, 1, "declare a durable queue",
-       NULL},
-      POPT_AUTOHELP{NULL, '\0', 0, NULL, 0, NULL, NULL}};
+       nullptr},
+      POPT_AUTOHELP{nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
   process_all_options(argc, argv, options);
 
-  if (queue == NULL) {
+  if (queue == nullptr) {
     fprintf(stderr, "queue name not specified\n");
     return 1;
   }
@@ -32,7 +32,7 @@ int main(int argc, const char **argv) {
   {
     amqp_queue_declare_ok_t *reply = amqp_queue_declare(
         conn, 1, cstring_bytes(queue), 0, durable, 0, 0, amqp_empty_table);
-    if (reply == NULL) {
+    if (reply == nullptr) {
       die_rpc(amqp_get_rpc_reply(conn), "queue.declare");
     }
 

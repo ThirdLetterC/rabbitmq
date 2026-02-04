@@ -13,14 +13,14 @@
 
 #include "utils.h"
 
-#define SUMMARY_EVERY_US 1000000
+static constexpr int summary_every_us = 1'000'000;
 
 static void run(amqp_connection_state_t conn) {
   uint64_t start_time = now_microseconds();
   int received = 0;
   int previous_received = 0;
   uint64_t previous_report_time = start_time;
-  uint64_t next_summary_time = start_time + SUMMARY_EVERY_US;
+  uint64_t next_summary_time = start_time + summary_every_us;
 
   amqp_frame_t frame;
 
@@ -41,11 +41,11 @@ static void run(amqp_connection_state_t conn) {
 
       previous_received = received;
       previous_report_time = now;
-      next_summary_time += SUMMARY_EVERY_US;
+      next_summary_time += summary_every_us;
     }
 
     amqp_maybe_release_buffers(conn);
-    ret = amqp_consume_message(conn, &envelope, NULL, 0);
+    ret = amqp_consume_message(conn, &envelope, nullptr, 0);
 
     if (AMQP_RESPONSE_NORMAL != ret.reply_type) {
       if (AMQP_RESPONSE_LIBRARY_EXCEPTION == ret.reply_type &&
@@ -119,7 +119,7 @@ int main(int argc, char const *const *argv) {
   int port, status;
   char const *exchange;
   char const *bindingkey;
-  amqp_socket_t *socket = NULL;
+  amqp_socket_t *socket = nullptr;
   amqp_connection_state_t conn;
 
   amqp_bytes_t queuename;
@@ -157,7 +157,7 @@ int main(int argc, char const *const *argv) {
         conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue");
     queuename = amqp_bytes_malloc_dup(r->queue);
-    if (queuename.bytes == NULL) {
+    if (queuename.bytes == nullptr) {
       fprintf(stderr, "Out of memory while copying queue name");
       return 1;
     }

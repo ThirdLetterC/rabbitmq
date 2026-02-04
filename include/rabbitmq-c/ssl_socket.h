@@ -29,11 +29,11 @@ AMQP_BEGIN_DECLS
  * \sa amqp_set_initialize_ssl_library()
  *
  * \param [in,out] state The connection object that owns the SSL/TLS socket
- * \return A new socket object or NULL if an error occurred.
+ * \return A new socket object or nullptr if an error occurred.
  *
  * \since v0.4.0
  */
-AMQP_EXPORT
+[[nodiscard]] AMQP_EXPORT
 amqp_socket_t *AMQP_CALL amqp_ssl_socket_new(amqp_connection_state_t state);
 
 /**

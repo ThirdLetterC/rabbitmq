@@ -6,11 +6,7 @@
 #ifndef AMQP_SSL_H
 #define AMQP_SSL_H
 
-#ifdef _MSC_VER
-#   pragma message("warning: amqp_ssl_socket.h is deprecated, use rabbitmq-c/ssl_socket.h instead.")
-#else
-#   warning "amqp_ssl_socket.h is deprecated, use rabbitmq-c/ssl_socket.h instead."
-#endif
+#warning "amqp_ssl_socket.h is deprecated, use rabbitmq-c/ssl_socket.h instead."
 
 #include <rabbitmq-c/ssl_socket.h>
 
