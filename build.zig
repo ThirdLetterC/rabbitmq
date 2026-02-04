@@ -3,7 +3,6 @@ const std = @import("std");
 fn addCommonSettings(
     step: *std.Build.Step.Compile,
     b: *std.Build,
-    target: std.Build.ResolvedTarget,
     enable_ssl: bool,
     amq_platform_define: []const u8,
 ) void {
@@ -13,13 +12,8 @@ fn addCommonSettings(
         step.addIncludePath(b.path("librabbitmq/unix"));
     }
 
-    switch (target.result.os.tag) {
-        .windows => step.root_module.addCMacro("HAVE_SELECT", "1"),
-        else => {
-            step.root_module.addCMacro("HAVE_POLL", "1");
-            step.root_module.addCMacro("_POSIX_C_SOURCE", "200809L");
-        },
-    }
+    step.root_module.addCMacro("HAVE_POLL", "1");
+    step.root_module.addCMacro("_POSIX_C_SOURCE", "200809L");
 
     step.root_module.addCMacro("AMQ_PLATFORM", amq_platform_define);
     step.linkLibC();
@@ -27,10 +21,6 @@ fn addCommonSettings(
 
 fn linkPlatformLibs(step: *std.Build.Step.Compile, target: std.Build.ResolvedTarget) void {
     switch (target.result.os.tag) {
-        .windows => {
-            step.linkSystemLibrary("ws2_32");
-            step.linkSystemLibrary("iphlpapi");
-        },
         .linux => {
             step.linkSystemLibrary("pthread");
             step.linkSystemLibrary("rt");
@@ -87,6 +77,10 @@ pub fn build(b: *std.Build) void {
     const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse false;
     const build_tests = b.option(bool, "tests", "Build tests") orelse false;
 
+    if (target.result.os.tag == .windows) {
+        @panic("Windows targets are not supported by this build configuration");
+    }
+
     if (!build_shared and !build_static) {
         @panic("At least one of -Dshared or -Dstatic must be true");
     }
@@ -123,7 +117,7 @@ pub fn build(b: *std.Build) void {
             .root_module = mk_module(b, target, optimize),
             .linkage = .dynamic,
         });
-        addCommonSettings(lib, b, target, enable_ssl, amq_platform_define);
+        addCommonSettings(lib, b, enable_ssl, amq_platform_define);
         addRabbitmqSources(lib, enable_ssl, cflags[0..]);
         lib.root_module.addCMacro("AMQP_EXPORTS", "1");
         linkPlatformLibs(lib, target);
@@ -141,7 +135,7 @@ pub fn build(b: *std.Build) void {
             .root_module = mk_module(b, target, optimize),
             .linkage = .static,
         });
-        addCommonSettings(lib, b, target, enable_ssl, amq_platform_define);
+        addCommonSettings(lib, b, enable_ssl, amq_platform_define);
         addRabbitmqSources(lib, enable_ssl, cflags[0..]);
         lib.root_module.addCMacro("AMQP_STATIC", "1");
         linkPlatformLibs(lib, target);
@@ -163,7 +157,7 @@ pub fn build(b: *std.Build) void {
             .linkage = .static,
         });
         examples_common.addIncludePath(b.path("examples"));
-        addCommonSettings(examples_common, b, target, enable_ssl, amq_platform_define);
+        addCommonSettings(examples_common, b, enable_ssl, amq_platform_define);
         examples_common.addCSourceFiles(.{
             .files = &.{
                 "examples/utils.c",
@@ -201,7 +195,7 @@ pub fn build(b: *std.Build) void {
                 .name = ex.name,
                 .root_module = mk_module(b, target, optimize),
             });
-            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            addCommonSettings(exe, b, enable_ssl, amq_platform_define);
             exe.addIncludePath(b.path("examples"));
             exe.addCSourceFiles(.{
                 .files = &.{ex.file},
@@ -229,7 +223,7 @@ pub fn build(b: *std.Build) void {
         });
         tools_common.addIncludePath(b.path("tools"));
         tools_common.addIncludePath(b.path("tools/unix"));
-        addCommonSettings(tools_common, b, target, enable_ssl, amq_platform_define);
+        addCommonSettings(tools_common, b, enable_ssl, amq_platform_define);
         tools_common.addCSourceFiles(.{
             .files = &.{
                 "tools/common.c",
@@ -259,7 +253,7 @@ pub fn build(b: *std.Build) void {
                 .name = tool.name,
                 .root_module = mk_module(b, target, optimize),
             });
-            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            addCommonSettings(exe, b, enable_ssl, amq_platform_define);
             exe.addIncludePath(b.path("tools"));
             exe.addIncludePath(b.path("tools/unix"));
             exe.addCSourceFiles(.{
@@ -306,7 +300,7 @@ pub fn build(b: *std.Build) void {
                 .name = test_bin.name,
                 .root_module = mk_module(b, target, optimize),
             });
-            addCommonSettings(exe, b, target, enable_ssl, amq_platform_define);
+            addCommonSettings(exe, b, enable_ssl, amq_platform_define);
             exe.addIncludePath(b.path("tests"));
             exe.addCSourceFiles(.{
                 .files = &.{test_bin.file},
