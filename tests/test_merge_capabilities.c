@@ -123,7 +123,7 @@ static void test_merge_capabilities(amqp_table_t* base, amqp_table_t* add,
   return;
 }
 
-int main(void) {
+int main() {
   {
     amqp_table_t sub_base;
     amqp_table_t sub_add;

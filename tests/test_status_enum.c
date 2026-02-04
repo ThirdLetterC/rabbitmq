@@ -22,7 +22,7 @@ static void check_errorstrings(amqp_status_enum start, amqp_status_enum end) {
   }
 }
 
-int main(void) {
+int main() {
   check_errorstrings(AMQP_STATUS_OK, _AMQP_STATUS_NEXT_VALUE);
   check_errorstrings(AMQP_STATUS_TCP_ERROR, _AMQP_STATUS_TCP_NEXT_VALUE);
   check_errorstrings(AMQP_STATUS_SSL_ERROR, _AMQP_STATUS_SSL_NEXT_VALUE);

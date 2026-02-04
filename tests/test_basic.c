@@ -184,7 +184,7 @@ void publish_and_consume_message(const char *msg_to_publish) {
   close_and_destroy_connection(connection_state);
 }
 
-int main(void) {
+int main() {
   publish_and_basic_get_message("");
   publish_and_basic_get_message("TEST");
 

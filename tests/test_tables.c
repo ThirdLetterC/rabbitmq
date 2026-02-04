@@ -390,7 +390,7 @@ static int compare_files(FILE *f1_in, FILE *f2_in) {
 
 const char *expected_file_name = "tests/test_tables.expected";
 
-int main(void) {
+int main() {
   char *srcdir = getenv("srcdir");
   FILE *out, *expected = nullptr;
   char *expected_path;

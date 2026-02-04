@@ -64,7 +64,7 @@ static void parse_fail(const char *url) {
   free(s);
 }
 
-int main(void) {
+int main() {
   /* From the spec */
   parse_success("amqp://user:pass@host:10000/vhost", "user", "pass", "host",
                 10000, "vhost");
