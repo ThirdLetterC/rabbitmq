@@ -151,6 +151,7 @@ pub fn build(b: *std.Build) void {
     const use_static = shared_lib == null;
 
     if (build_examples) {
+        const examples_step = b.step("examples", "Build example binaries");
         const examples_common = b.addLibrary(.{
             .name = "examples-common",
             .root_module = mk_module(b, target, optimize),
@@ -211,7 +212,9 @@ pub fn build(b: *std.Build) void {
                 exe.linkSystemLibrary("ssl");
                 exe.linkSystemLibrary("crypto");
             }
-            b.installArtifact(exe);
+            const install_exe = b.addInstallArtifact(exe, .{});
+            b.getInstallStep().dependOn(&install_exe.step);
+            examples_step.dependOn(&install_exe.step);
         }
     }
 
