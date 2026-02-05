@@ -74,7 +74,7 @@ pub fn build(b: *std.Build) void {
     const build_shared = b.option(bool, "shared", "Build shared library") orelse true;
     const build_static = b.option(bool, "static", "Build static library") orelse true;
     const build_examples = b.option(bool, "examples", "Build examples") orelse true;
-    const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse false;
+    const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse true;
     const build_tests = b.option(bool, "tests", "Build tests") orelse false;
 
     if (target.result.os.tag == .windows) {
@@ -219,6 +219,7 @@ pub fn build(b: *std.Build) void {
     }
 
     if (build_tools) {
+        const tools_step = b.step("tools", "Build CLI tools");
         const tools_common = b.addLibrary(.{
             .name = "tools-common",
             .root_module = mk_module(b, target, optimize),
@@ -281,7 +282,9 @@ pub fn build(b: *std.Build) void {
             exe.linkLibrary(tools_common);
             exe.linkLibrary(link_lib);
             linkPlatformLibs(exe, target);
-            b.installArtifact(exe);
+            const install_exe = b.addInstallArtifact(exe, .{});
+            b.getInstallStep().dependOn(&install_exe.step);
+            tools_step.dependOn(&install_exe.step);
         }
     }
 

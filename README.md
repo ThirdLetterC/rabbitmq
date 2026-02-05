@@ -21,24 +21,16 @@ Use the provided Zig build:
 zig build
 ```
 
-Common targets:
-
-```
-zig build test
-zig build examples
-zig build tools
-```
-
 ## Layout
 
 - `include/` public headers
-- `librabbitmq/` library sources
+- `src/` library sources
 - `examples/` and `tools/` sample programs
 - `tests/` test suites
 
 ## Usage
 
-Headers are exported under `include/rabbitmq-c/`. Start with:
+Headers are exported under `include/rabbitmq/`. Start with:
 
 ```
 #include "rabbitmq/amqp.h"
