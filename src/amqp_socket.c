@@ -102,7 +102,8 @@ int amqp_socket_get_sockfd(amqp_socket_t *self) {
   return self->klass->get_sockfd(self);
 }
 
-int amqp_poll([[maybe_unused]] int fd, [[maybe_unused]] int event, [[maybe_unused]] amqp_time_t deadline) {
+int amqp_poll([[maybe_unused]] int fd, [[maybe_unused]] int event,
+              [[maybe_unused]] amqp_time_t deadline) {
 #ifdef HAVE_POLL
   struct pollfd pfd;
   int res;

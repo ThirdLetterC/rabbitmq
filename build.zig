@@ -7,9 +7,9 @@ fn addCommonSettings(
     amq_platform_define: []const u8,
 ) void {
     step.addIncludePath(b.path("include"));
-    step.addIncludePath(b.path("librabbitmq"));
+    step.addIncludePath(b.path("src"));
     if (enable_ssl) {
-        step.addIncludePath(b.path("librabbitmq/unix"));
+        step.addIncludePath(b.path("src/unix"));
     }
 
     step.root_module.addCMacro("HAVE_POLL", "1");
@@ -37,16 +37,16 @@ fn addRabbitmqSources(
     cflags: []const []const u8,
 ) void {
     const base_sources = [_][]const u8{
-        "librabbitmq/amqp_api.c",
-        "librabbitmq/amqp_connection.c",
-        "librabbitmq/amqp_consumer.c",
-        "librabbitmq/amqp_framing.c",
-        "librabbitmq/amqp_mem.c",
-        "librabbitmq/amqp_socket.c",
-        "librabbitmq/amqp_table.c",
-        "librabbitmq/amqp_tcp_socket.c",
-        "librabbitmq/amqp_time.c",
-        "librabbitmq/amqp_url.c",
+        "src/amqp_api.c",
+        "src/amqp_connection.c",
+        "src/amqp_consumer.c",
+        "src/amqp_framing.c",
+        "src/amqp_mem.c",
+        "src/amqp_socket.c",
+        "src/amqp_table.c",
+        "src/amqp_tcp_socket.c",
+        "src/amqp_time.c",
+        "src/amqp_url.c",
     };
 
     step.addCSourceFiles(.{
@@ -56,8 +56,8 @@ fn addRabbitmqSources(
 
     if (enable_ssl) {
         const ssl_sources = [_][]const u8{
-            "librabbitmq/amqp_openssl.c",
-            "librabbitmq/amqp_openssl_bio.c",
+            "src/amqp_openssl.c",
+            "src/amqp_openssl_bio.c",
         };
         step.addCSourceFiles(.{
             .files = ssl_sources[0..],
