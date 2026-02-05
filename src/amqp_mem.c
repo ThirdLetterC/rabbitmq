@@ -114,6 +114,9 @@ void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
       return nullptr;
     }
     if (!record_pool_block(&pool->pages, pool->alloc_block)) {
+      free(pool->alloc_block);
+      pool->alloc_block = nullptr;
+      pool->alloc_used = 0;
       return nullptr;
     }
     pool->next_page = pool->pages.num_blocks;

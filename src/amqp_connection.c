@@ -70,6 +70,7 @@ amqp_connection_state_t amqp_new_connection() {
   return state;
 
 out_nomem:
+  free(state->outbound_buffer.bytes);
   free(state->sock_inbound_buffer.bytes);
   free(state);
   return nullptr;
