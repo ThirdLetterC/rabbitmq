@@ -75,7 +75,7 @@ pub fn build(b: *std.Build) void {
     const build_static = b.option(bool, "static", "Build static library") orelse true;
     const build_examples = b.option(bool, "examples", "Build examples") orelse true;
     const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse true;
-    const build_tests = b.option(bool, "tests", "Build tests") orelse false;
+    const build_tests = b.option(bool, "tests", "Build tests") orelse true;
 
     if (target.result.os.tag == .windows) {
         @panic("Windows targets are not supported by this build configuration");
@@ -289,6 +289,7 @@ pub fn build(b: *std.Build) void {
     }
 
     if (build_tests) {
+        const tests_step = b.step("tests", "Build tests");
         const tests = [_]struct {
             name: []const u8,
             file: []const u8,
@@ -321,7 +322,9 @@ pub fn build(b: *std.Build) void {
                 exe.linkSystemLibrary("ssl");
                 exe.linkSystemLibrary("crypto");
             }
-            b.installArtifact(exe);
+            const install_exe = b.addInstallArtifact(exe, .{});
+            b.getInstallStep().dependOn(&install_exe.step);
+            tests_step.dependOn(&install_exe.step);
         }
     }
 }
