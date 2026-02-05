@@ -1,18 +1,21 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include "common.h"
-#ifdef WITH_SSL
-#include <rabbitmq-c/ssl_socket.h>
-#endif
 #include <errno.h>
 #include <fcntl.h>
-#include <rabbitmq-c/tcp_socket.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "common.h"
+
+#ifdef WITH_SSL
+#include "rabbitmq/ssl_socket.h"
+#endif
+
+#include "rabbitmq/tcp_socket.h"
 
 /* For when reading auth data from a file */
 static constexpr size_t max_auth_token_len = 128;

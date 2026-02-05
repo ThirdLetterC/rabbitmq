@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <rabbitmq-c/amqp.h>
+#include "rabbitmq/amqp.h"
 
 void die(const char *fmt, ...);
 extern void die_on_error(int x, char const *context);

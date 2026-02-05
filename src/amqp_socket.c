@@ -34,10 +34,10 @@
 #endif
 #include <unistd.h>
 
-#include "rabbitmq-c/amqp_private.h"
-#include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/amqp_table.h"
-#include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq//amqp_private.h"
+#include "rabbitmq//amqp_socket.h"
+#include "rabbitmq//amqp_table.h"
+#include "rabbitmq//amqp_time.h"
 
 static constexpr char amqp_platform[] =
 #ifdef AMQ_PLATFORM

@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp.h"
-#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq//amqp.h"
+#include "rabbitmq//amqp_socket.h"
 
 static int amqp_basic_properties_clone(amqp_basic_properties_t *original,
                                        amqp_basic_properties_t *clone,

@@ -12,7 +12,7 @@ static constexpr char AMQ_COPYRIGHT[] =
     "Copyright (c) 2007-2014 VMWare Inc, Tony Garnock-Jones,"
     " and Alan Antonuk.";
 
-#include "rabbitmq-c/amqp.h"
+#include "rabbitmq//amqp.h"
 #include <string.h>
 
 #include <arpa/inet.h>

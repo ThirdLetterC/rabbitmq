@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
-#include "rabbitmq-c/amqp_private.h"
-#include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/tcp_socket.h"
+#include "rabbitmq//amqp_private.h"
+#include "rabbitmq//amqp_socket.h"
+#include "rabbitmq//tcp_socket.h"
 
 struct amqp_tcp_socket_t {
   const struct amqp_socket_class_t *klass;

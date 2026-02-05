@@ -3,7 +3,7 @@
 
 /** \file */
 
-#include <rabbitmq-c/export.h>
+#include "rabbitmq/export.h"
 
 #ifndef RABBITMQ_C_RABBITMQ_C_H
 #define RABBITMQ_C_RABBITMQ_C_H
@@ -649,7 +649,7 @@ typedef enum {
 
 AMQP_END_DECLS
 
-#include <rabbitmq-c/framing.h>
+#include "rabbitmq/framing.h"
 
 AMQP_BEGIN_DECLS
 

@@ -4,8 +4,8 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "rabbitmq-c/amqp.h"
-#include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq//amqp.h"
+#include "rabbitmq//amqp_time.h"
 
 #if (defined(machintosh) || defined(__APPLE__) || defined(__APPLE_CC__))
 #define AMQP_MAC_TIMER_API

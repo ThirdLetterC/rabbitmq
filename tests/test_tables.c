@@ -9,7 +9,7 @@
 
 #include <inttypes.h>
 
-#include "rabbitmq-c/amqp.h"
+#include "rabbitmq//amqp.h"
 
 static constexpr double amqp_pi = 3.14159265358979323846264338327950288;
 

@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/amqp_table.h"
+#include "rabbitmq//amqp_socket.h"
+#include "rabbitmq//amqp_table.h"
 
 static int compare_bytes(amqp_bytes_t l, amqp_bytes_t r);
 static int compare_amqp_table_entry(amqp_table_entry_t result,

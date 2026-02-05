@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp_private.h"
-#include "rabbitmq-c/amqp_table.h"
+#include "rabbitmq//amqp_private.h"
+#include "rabbitmq//amqp_table.h"
 
 static constexpr int initial_array_size = 16;
 static constexpr int initial_table_size = 16;

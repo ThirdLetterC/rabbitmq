@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/tcp_socket.h>
+#include "rabbitmq/amqp.h"
+#include "rabbitmq/tcp_socket.h"
 
 #include "utils.h"
 

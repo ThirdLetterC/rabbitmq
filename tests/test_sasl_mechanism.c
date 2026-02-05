@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq//amqp_socket.h"
 
 static void parse_success(amqp_bytes_t mechanisms,
                           amqp_sasl_method_enum method) {

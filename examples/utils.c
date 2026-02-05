@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/framing.h>
+#include "rabbitmq/amqp.h"
+#include "rabbitmq/framing.h"
 #include <stdint.h>
 
 #include "utils.h"

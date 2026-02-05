@@ -12,7 +12,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-#include "rabbitmq-c/amqp_private.h"
+#include "rabbitmq//amqp_private.h"
 
 char const *amqp_version() { return AMQP_VERSION_STRING; }
 

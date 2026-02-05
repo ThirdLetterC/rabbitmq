@@ -5,8 +5,7 @@
 
 #include <popt.h>
 
-#include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/framing.h>
+#include "rabbitmq/amqp.h"
 
 extern const char *amqp_server_exception_string(amqp_rpc_reply_t r);
 extern const char *amqp_rpc_reply_string(amqp_rpc_reply_t r);

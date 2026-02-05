@@ -41,7 +41,7 @@ zig build tools
 Headers are exported under `include/rabbitmq-c/`. Start with:
 
 ```
-#include <rabbitmq-c/amqp.h>
+#include "rabbitmq/amqp.h"
 ```
 
 Examples live in `examples/` and `tools/` and are built by the Zig build targets above.

@@ -6,8 +6,8 @@
 #ifndef RABBITMQ_C_SSL_SOCKET_H
 #define RABBITMQ_C_SSL_SOCKET_H
 
-#include <rabbitmq-c/amqp.h>
-#include <rabbitmq-c/export.h>
+#include "rabbitmq/amqp.h"
+#include "rabbitmq/export.h"
 
 AMQP_BEGIN_DECLS
 

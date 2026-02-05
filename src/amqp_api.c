@@ -11,9 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp_private.h"
-#include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/amqp_time.h"
+#include "rabbitmq//amqp_private.h"
+#include "rabbitmq//amqp_socket.h"
+#include "rabbitmq//amqp_time.h"
 
 static constexpr int error_mask = 0b0000'0000'1111'1111;
 static constexpr int error_category_mask = 0b1111'1111'0000'0000;

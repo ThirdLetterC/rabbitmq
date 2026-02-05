@@ -5,7 +5,7 @@
 #include "config.h"
 #endif
 
-#include "rabbitmq-c/amqp.h"
+#include "rabbitmq//amqp.h"
 
 #include <stdio.h>
 #include <stdlib.h>

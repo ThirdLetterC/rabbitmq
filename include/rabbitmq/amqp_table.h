@@ -5,7 +5,7 @@
 #define AMQP_TABLE_H
 
 #include "amqp_private.h"
-#include "rabbitmq-c/amqp.h"
+#include "rabbitmq//amqp.h"
 
 /**
  * Initializes a table entry with utf-8 string type value.

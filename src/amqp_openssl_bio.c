@@ -7,8 +7,8 @@
 
 #include <openssl/bio.h>
 
-#include "rabbitmq-c/amqp_openssl_bio.h"
-#include "rabbitmq-c/amqp_socket.h"
+#include "rabbitmq//amqp_openssl_bio.h"
+#include "rabbitmq//amqp_socket.h"
 
 #ifdef MSG_NOSIGNAL
 #define AMQP_USE_AMQP_BIO

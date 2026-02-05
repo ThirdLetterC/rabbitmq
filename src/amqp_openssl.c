@@ -21,11 +21,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "rabbitmq-c/amqp_openssl_bio.h"
-#include "rabbitmq-c/amqp_private.h"
-#include "rabbitmq-c/amqp_socket.h"
-#include "rabbitmq-c/amqp_time.h"
-#include "rabbitmq-c/ssl_socket.h"
+#include "rabbitmq//amqp_openssl_bio.h"
+#include "rabbitmq//amqp_private.h"
+#include "rabbitmq//amqp_socket.h"
+#include "rabbitmq//amqp_time.h"
+#include "rabbitmq//ssl_socket.h"
 
 static int initialize_ssl_and_increment_connections();
 static int decrement_ssl_connections();
