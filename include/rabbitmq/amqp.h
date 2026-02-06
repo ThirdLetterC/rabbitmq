@@ -145,7 +145,7 @@ static constexpr uint32_t AMQP_VERSION =
  *
  * \since v0.4.0
  */
-static constexpr char AMQP_VERSION_STRING[] = "0.16.0-pre";
+static constexpr char AMQP_VERSION_STRING[] = "0.16.0";
 
 /**
  * Returns the rabbitmq-c version as a packed integer.

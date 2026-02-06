@@ -9,8 +9,8 @@
 #endif
 
 static constexpr char AMQ_COPYRIGHT[] =
-    "Copyright (c) 2007-2014 VMWare Inc, Tony Garnock-Jones,"
-    " and Alan Antonuk.";
+    "Copyright (c) 2007-2014 VMWare Inc, Tony Garnock-Jones, Alan Antonuk"
+    " and Yehor Smoliakov.";
 
 #include "rabbitmq//amqp.h"
 #include <string.h>

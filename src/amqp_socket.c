@@ -1215,7 +1215,7 @@ static amqp_rpc_reply_t amqp_login_inner(amqp_connection_state_t state,
     default_properties[3] =
         amqp_table_construct_utf8_entry("copyright", AMQ_COPYRIGHT);
     default_properties[4] = amqp_table_construct_utf8_entry(
-        "information", "See https://github.com/alanxz/rabbitmq-c");
+        "information", "See https://github.com/ThirdLetterC/rabbitmq");
     default_properties[5] = amqp_table_construct_table_entry(
         "capabilities", &client_capabilities_table);
 
