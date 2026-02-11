@@ -1,7 +1,7 @@
 set shell := ["bash", "-cu"]
 
 zig := env_var_or_default("ZIG", "zig")
-clang_format := env_var_or_default("CLANG_FORMAT", "clang-format-20")
+clang_format := env_var_or_default("CLANG_FORMAT", "clang-format")
 
 default: help
 
