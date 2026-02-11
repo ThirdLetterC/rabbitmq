@@ -38,10 +38,7 @@ fn addHardeningSettings(
     enable_sanitizers: bool,
 ) void {
     if (enable_sanitizers) {
-        step.bundle_compiler_rt = true;
-        step.bundle_ubsan_rt = true;
-        step.linkSystemLibrary("asan");
-        step.linkSystemLibrary("ubsan");
+        step.root_module.sanitize_c = .full;
     }
 
     if (!enable_hardening) {
@@ -103,8 +100,11 @@ pub fn build(b: *std.Build) void {
     const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse true;
     const build_tests = b.option(bool, "tests", "Build tests") orelse true;
     const enable_hardening = b.option(bool, "hardening", "Enable hardening linker/compiler flags") orelse true;
-    const enable_sanitizers =
-        b.option(bool, "sanitizers", "Enable -fsanitize=address,undefined,leak") orelse false;
+    const enable_sanitizers = b.option(
+        bool,
+        "sanitizers",
+        "Enable Zig C sanitizer mode (-fsanitize-c=full)",
+    ) orelse false;
 
     if (target.result.os.tag == .windows) {
         @panic("Windows targets are not supported by this build configuration");
@@ -133,10 +133,6 @@ pub fn build(b: *std.Build) void {
         if (optimize != .Debug) {
             cflags.append("-D_FORTIFY_SOURCE=3") catch @panic("failed to append fortify C flag");
         }
-    }
-
-    if (enable_sanitizers) {
-        cflags.append("-fsanitize=address,undefined,leak") catch @panic("failed to append sanitizer C flag");
     }
 
     const mk_module = struct {
