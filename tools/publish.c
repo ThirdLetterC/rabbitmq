@@ -121,7 +121,7 @@ int main(int argc, const char **argv) {
     body_bytes = amqp_cstring_bytes(body);
   } else {
     if (line_buffered) {
-      body_bytes.bytes = (char *)malloc(max_line_length);
+      body_bytes.bytes = (char *)calloc(max_line_length, sizeof(char));
       if (body_bytes.bytes == nullptr) {
         fprintf(stderr, "Memory allocation failed\n");
         return 1;

@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <stdarg.h>
+#include <stdckdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -407,8 +408,15 @@ int main() {
     srcdir = ".";
   }
 
-  auto expected_path_size = strlen(srcdir) + strlen(expected_file_name) + 2;
-  expected_path = malloc(expected_path_size);
+  size_t expected_path_size;
+  auto srcdir_len = strlen(srcdir);
+  auto expected_name_len = strlen(expected_file_name);
+  if (ckd_add(&expected_path_size, srcdir_len, expected_name_len) ||
+      ckd_add(&expected_path_size, expected_path_size, (size_t)2)) {
+    die("expected path is too long");
+  }
+
+  expected_path = (char *)calloc(expected_path_size, sizeof(char));
   if (expected_path == nullptr) {
     die("out of memory");
   }

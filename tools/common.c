@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <stdckdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -170,8 +171,9 @@ void read_authfile(const char *path) {
   FILE *fp = nullptr;
   char token[max_auth_token_len];
 
-  if ((amqp_username = malloc(max_auth_token_len)) == nullptr ||
-      (amqp_password = malloc(max_auth_token_len)) == nullptr) {
+  amqp_username = (char *)calloc(max_auth_token_len, sizeof(char));
+  amqp_password = (char *)calloc(max_auth_token_len, sizeof(char));
+  if (amqp_username == nullptr || amqp_password == nullptr) {
     die("Out of memory");
   } else if ((fp = fopen(path, "r")) == nullptr) {
     die("Could not read auth data file %s", path);
@@ -244,7 +246,15 @@ static void init_connection_info(struct amqp_connection_info *ci) {
               "Specifying the port number with --server is deprecated\n");
 
       host_len = colon - amqp_server;
-      ci->host = malloc(host_len + 1);
+      size_t host_size;
+      if (ckd_add(&host_size, host_len, (size_t)1)) {
+        die("server host is too long");
+      }
+
+      ci->host = (char *)calloc(host_size, sizeof(char));
+      if (ci->host == nullptr) {
+        die("Out of memory");
+      }
       memcpy(ci->host, amqp_server, host_len);
       ci->host[host_len] = 0;
 
@@ -329,7 +339,7 @@ static void init_connection_info(struct amqp_connection_info *ci) {
   }
 }
 
-amqp_connection_state_t make_connection(void) {
+amqp_connection_state_t make_connection() {
   int status;
   amqp_socket_t *socket = nullptr;
   struct amqp_connection_info ci;
@@ -385,7 +395,10 @@ amqp_bytes_t read_all(int fd) {
   size_t space = 4096;
   amqp_bytes_t bytes;
 
-  bytes.bytes = malloc(space);
+  bytes.bytes = calloc(space, sizeof(char));
+  if (bytes.bytes == nullptr) {
+    die("Out of memory");
+  }
   bytes.len = 0;
 
   for (;;) {
@@ -404,8 +417,20 @@ amqp_bytes_t read_all(int fd) {
 
     bytes.len += res;
     if (bytes.len == space) {
-      space *= 2;
-      bytes.bytes = realloc(bytes.bytes, space);
+      size_t new_space;
+      if (ckd_mul(&new_space, space, (size_t)2)) {
+        free(bytes.bytes);
+        die("input is too large");
+      }
+
+      void *new_bytes = realloc(bytes.bytes, new_space);
+      if (new_bytes == nullptr) {
+        free(bytes.bytes);
+        die("Out of memory");
+      }
+
+      bytes.bytes = new_bytes;
+      space = new_space;
     }
   }
 

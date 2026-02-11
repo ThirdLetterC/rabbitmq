@@ -1,6 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
+#include <stdckdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +16,13 @@ static constexpr char listen_keys_delimiter[] = ",";
    use the same escaping conventions as rabbitmqctl. */
 static char *stringify_bytes(amqp_bytes_t bytes) {
   /* We will need up to 4 chars per byte, plus the terminating 0 */
-  char *res = malloc(bytes.len * 4 + 1);
+  size_t alloc_len;
+  if (ckd_mul(&alloc_len, bytes.len, (size_t)4) ||
+      ckd_add(&alloc_len, alloc_len, (size_t)1)) {
+    return nullptr;
+  }
+
+  char *res = (char *)calloc(alloc_len, sizeof(char));
   if (res == nullptr) {
     return nullptr;
   }

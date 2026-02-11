@@ -18,7 +18,7 @@
 static const int fixed_channel_id = 1;
 static const char test_queue_name[] = "test_queue";
 
-amqp_connection_state_t setup_connection_and_channel(void) {
+amqp_connection_state_t setup_connection_and_channel() {
   amqp_connection_state_t connection_state_ = amqp_new_connection();
 
   amqp_socket_t *socket = amqp_tcp_socket_new(connection_state_);

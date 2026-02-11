@@ -6,7 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 
-uint64_t now_microseconds(void) {
+uint64_t now_microseconds() {
   struct timeval tv;
   gettimeofday(&tv, nullptr);
   return (uint64_t)tv.tv_sec * 1'000'000 + (uint64_t)tv.tv_usec;

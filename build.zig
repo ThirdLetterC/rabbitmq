@@ -31,6 +31,32 @@ fn linkPlatformLibs(step: *std.Build.Step.Compile, target: std.Build.ResolvedTar
     }
 }
 
+fn addHardeningSettings(
+    step: *std.Build.Step.Compile,
+    target: std.Build.ResolvedTarget,
+    enable_hardening: bool,
+    enable_sanitizers: bool,
+) void {
+    if (enable_sanitizers) {
+        step.bundle_compiler_rt = true;
+        step.bundle_ubsan_rt = true;
+        step.linkSystemLibrary("asan");
+        step.linkSystemLibrary("ubsan");
+    }
+
+    if (!enable_hardening) {
+        return;
+    }
+
+    // Keep relocations read-only and resolved at startup.
+    step.link_z_relro = true;
+    step.link_z_lazy = false;
+
+    if (target.result.os.tag == .linux and (step.kind == .exe or step.kind == .@"test")) {
+        step.pie = true;
+    }
+}
+
 fn addRabbitmqSources(
     step: *std.Build.Step.Compile,
     enable_ssl: bool,
@@ -76,6 +102,9 @@ pub fn build(b: *std.Build) void {
     const build_examples = b.option(bool, "examples", "Build examples") orelse true;
     const build_tools = b.option(bool, "tools", "Build CLI tools (requires popt)") orelse true;
     const build_tests = b.option(bool, "tests", "Build tests") orelse true;
+    const enable_hardening = b.option(bool, "hardening", "Enable hardening linker/compiler flags") orelse true;
+    const enable_sanitizers =
+        b.option(bool, "sanitizers", "Enable -fsanitize=address,undefined,leak") orelse false;
 
     if (target.result.os.tag == .windows) {
         @panic("Windows targets are not supported by this build configuration");
@@ -90,13 +119,25 @@ pub fn build(b: *std.Build) void {
         @tagName(target.result.os.tag),
     });
 
-    const cflags = [_][]const u8{
+    var cflags = std.array_list.Managed([]const u8).init(b.allocator);
+    cflags.appendSlice(&.{
         "-std=c23",
         "-Wall",
         "-Wextra",
         "-Wpedantic",
         "-Werror",
-    };
+    }) catch @panic("failed to append base C flags");
+
+    if (enable_hardening) {
+        cflags.append("-fstack-protector-strong") catch @panic("failed to append hardening C flags");
+        if (optimize != .Debug) {
+            cflags.append("-D_FORTIFY_SOURCE=3") catch @panic("failed to append fortify C flag");
+        }
+    }
+
+    if (enable_sanitizers) {
+        cflags.append("-fsanitize=address,undefined,leak") catch @panic("failed to append sanitizer C flag");
+    }
 
     const mk_module = struct {
         fn create(bld: *std.Build, tgt: std.Build.ResolvedTarget, opt: std.builtin.OptimizeMode) *std.Build.Module {
@@ -118,7 +159,8 @@ pub fn build(b: *std.Build) void {
             .linkage = .dynamic,
         });
         addCommonSettings(lib, b, enable_ssl, amq_platform_define);
-        addRabbitmqSources(lib, enable_ssl, cflags[0..]);
+        addHardeningSettings(lib, target, enable_hardening, enable_sanitizers);
+        addRabbitmqSources(lib, enable_ssl, cflags.items);
         lib.root_module.addCMacro("AMQP_EXPORTS", "1");
         linkPlatformLibs(lib, target);
         if (enable_ssl) {
@@ -136,7 +178,8 @@ pub fn build(b: *std.Build) void {
             .linkage = .static,
         });
         addCommonSettings(lib, b, enable_ssl, amq_platform_define);
-        addRabbitmqSources(lib, enable_ssl, cflags[0..]);
+        addHardeningSettings(lib, target, enable_hardening, enable_sanitizers);
+        addRabbitmqSources(lib, enable_ssl, cflags.items);
         lib.root_module.addCMacro("AMQP_STATIC", "1");
         linkPlatformLibs(lib, target);
         if (enable_ssl) {
@@ -159,12 +202,13 @@ pub fn build(b: *std.Build) void {
         });
         examples_common.addIncludePath(b.path("examples"));
         addCommonSettings(examples_common, b, enable_ssl, amq_platform_define);
+        addHardeningSettings(examples_common, target, enable_hardening, enable_sanitizers);
         examples_common.addCSourceFiles(.{
             .files = &.{
                 "examples/utils.c",
                 "examples/unix/platform_utils.c",
             },
-            .flags = cflags[0..],
+            .flags = cflags.items,
         });
         if (use_static) {
             examples_common.root_module.addCMacro("AMQP_STATIC", "1");
@@ -197,10 +241,11 @@ pub fn build(b: *std.Build) void {
                 .root_module = mk_module(b, target, optimize),
             });
             addCommonSettings(exe, b, enable_ssl, amq_platform_define);
+            addHardeningSettings(exe, target, enable_hardening, enable_sanitizers);
             exe.addIncludePath(b.path("examples"));
             exe.addCSourceFiles(.{
                 .files = &.{ex.file},
-                .flags = cflags[0..],
+                .flags = cflags.items,
             });
             if (use_static) {
                 exe.root_module.addCMacro("AMQP_STATIC", "1");
@@ -228,11 +273,12 @@ pub fn build(b: *std.Build) void {
         tools_common.addIncludePath(b.path("tools"));
         tools_common.addIncludePath(b.path("tools/unix"));
         addCommonSettings(tools_common, b, enable_ssl, amq_platform_define);
+        addHardeningSettings(tools_common, target, enable_hardening, enable_sanitizers);
         tools_common.addCSourceFiles(.{
             .files = &.{
                 "tools/common.c",
             },
-            .flags = cflags[0..],
+            .flags = cflags.items,
         });
         if (use_static) {
             tools_common.root_module.addCMacro("AMQP_STATIC", "1");
@@ -258,6 +304,7 @@ pub fn build(b: *std.Build) void {
                 .root_module = mk_module(b, target, optimize),
             });
             addCommonSettings(exe, b, enable_ssl, amq_platform_define);
+            addHardeningSettings(exe, target, enable_hardening, enable_sanitizers);
             exe.addIncludePath(b.path("tools"));
             exe.addIncludePath(b.path("tools/unix"));
             exe.addCSourceFiles(.{
@@ -268,7 +315,7 @@ pub fn build(b: *std.Build) void {
                     }
                 else
                     &.{tool.file},
-                .flags = cflags[0..],
+                .flags = cflags.items,
             });
             if (use_static) {
                 exe.root_module.addCMacro("AMQP_STATIC", "1");
@@ -308,10 +355,11 @@ pub fn build(b: *std.Build) void {
                 .root_module = mk_module(b, target, optimize),
             });
             addCommonSettings(exe, b, enable_ssl, amq_platform_define);
+            addHardeningSettings(exe, target, enable_hardening, enable_sanitizers);
             exe.addIncludePath(b.path("tests"));
             exe.addCSourceFiles(.{
                 .files = &.{test_bin.file},
-                .flags = cflags[0..],
+                .flags = cflags.items,
             });
             if (use_static) {
                 exe.root_module.addCMacro("AMQP_STATIC", "1");
