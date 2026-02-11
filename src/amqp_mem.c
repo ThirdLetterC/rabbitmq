@@ -6,6 +6,8 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
+#include <stdckdint.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +61,18 @@ void empty_amqp_pool(amqp_pool_t *pool) {
 
 /* Returns 1 on success, 0 on failure */
 static int record_pool_block(amqp_pool_blocklist_t *x, void *block) {
-  size_t blocklistlength = sizeof(void *) * (x->num_blocks + 1);
+  size_t next_num_blocks;
+  size_t blocklistlength;
+
+  if (x->num_blocks < 0 || x->num_blocks == INT_MAX) {
+    return 0;
+  }
+
+  next_num_blocks = (size_t)x->num_blocks;
+  if (ckd_add(&next_num_blocks, next_num_blocks, (size_t)1) ||
+      ckd_mul(&blocklistlength, next_num_blocks, sizeof(void *))) {
+    return 0;
+  }
 
   if (x->blocklist == nullptr) {
     x->blocklist = calloc(1, blocklistlength);
@@ -80,11 +93,17 @@ static int record_pool_block(amqp_pool_blocklist_t *x, void *block) {
 }
 
 void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
+  size_t aligned_amount;
+
   if (amount == 0) {
     return nullptr;
   }
 
-  amount = (amount + 7) & (~7); /* round up to nearest 8-byte boundary */
+  if (ckd_add(&aligned_amount, amount, (size_t)7)) {
+    return nullptr;
+  }
+  amount =
+      aligned_amount & ~(size_t)7; /* round up to nearest 8-byte boundary */
 
   if (amount > pool->pagesize) {
     void *result = calloc(1, amount);
@@ -99,11 +118,14 @@ void *amqp_pool_alloc(amqp_pool_t *pool, size_t amount) {
   }
 
   if (pool->alloc_block != nullptr) {
+    size_t new_alloc_used;
+
     assert(pool->alloc_used <= pool->pagesize);
 
-    if (pool->alloc_used + amount <= pool->pagesize) {
+    if (!ckd_add(&new_alloc_used, pool->alloc_used, amount) &&
+        new_alloc_used <= pool->pagesize) {
       void *result = pool->alloc_block + pool->alloc_used;
-      pool->alloc_used += amount;
+      pool->alloc_used = new_alloc_used;
       return result;
     }
   }

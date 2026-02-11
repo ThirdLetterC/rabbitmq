@@ -104,6 +104,15 @@ int amqp_tune_connection(amqp_connection_state_t state, int channel_max,
 
   ENFORCE_STATE(state, CONNECTION_STATE_IDLE);
 
+  if (frame_max <= (int)(HEADER_SIZE + FOOTER_SIZE)) {
+    return AMQP_STATUS_INVALID_PARAMETER;
+  }
+
+  newbuf = realloc(state->outbound_buffer.bytes, (size_t)frame_max);
+  if (newbuf == nullptr) {
+    return AMQP_STATUS_NO_MEMORY;
+  }
+
   state->channel_max = channel_max;
   state->frame_max = frame_max;
 
@@ -123,12 +132,8 @@ int amqp_tune_connection(amqp_connection_state_t state, int channel_max,
     return res;
   }
 
-  state->outbound_buffer.len = frame_max;
-  newbuf = realloc(state->outbound_buffer.bytes, frame_max);
-  if (newbuf == nullptr) {
-    return AMQP_STATUS_NO_MEMORY;
-  }
   state->outbound_buffer.bytes = newbuf;
+  state->outbound_buffer.len = (size_t)frame_max;
 
   return AMQP_STATUS_OK;
 }

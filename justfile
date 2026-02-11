@@ -12,7 +12,7 @@ build:
     {{zig}} build
 
 test:
-    {{zig}} build test
+    {{zig}} build tests
 
 examples:
     {{zig}} build examples

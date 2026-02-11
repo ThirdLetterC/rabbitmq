@@ -6,6 +6,8 @@
 #endif
 
 #include <assert.h>
+#include <limits.h>
+#include <stdckdint.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,27 +42,43 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  if (arraysize + *offset > encoded.len) {
+  if (ckd_add(&limit, *offset, (size_t)arraysize) || limit > encoded.len) {
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  entries = calloc(allocated_entries, sizeof(amqp_field_value_t));
+  {
+    size_t entries_size;
+    if (allocated_entries <= 0 ||
+        ckd_mul(&entries_size, (size_t)allocated_entries,
+                sizeof(amqp_field_value_t))) {
+      return AMQP_STATUS_NO_MEMORY;
+    }
+    entries = calloc(1, entries_size);
+  }
   if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
-  limit = *offset + arraysize;
   while (*offset < limit) {
     if (num_entries >= allocated_entries) {
       void *newentries;
-      allocated_entries = allocated_entries * 2;
-      newentries =
-          realloc(entries, allocated_entries * sizeof(amqp_field_value_t));
+      size_t next_allocated_entries;
+      size_t next_entries_size;
       res = AMQP_STATUS_NO_MEMORY;
+      if (allocated_entries <= 0 ||
+          ckd_mul(&next_allocated_entries, (size_t)allocated_entries,
+                  (size_t)2) ||
+          next_allocated_entries > (size_t)INT_MAX ||
+          ckd_mul(&next_entries_size, next_allocated_entries,
+                  sizeof(amqp_field_value_t))) {
+        goto out;
+      }
+      newentries = realloc(entries, next_entries_size);
       if (newentries == nullptr) {
         goto out;
       }
 
+      allocated_entries = (int)next_allocated_entries;
       entries = newentries;
     }
 
@@ -70,23 +88,34 @@ static int amqp_decode_array(amqp_bytes_t encoded, amqp_pool_t *pool,
       goto out;
     }
 
+    if (num_entries == INT_MAX) {
+      res = AMQP_STATUS_NO_MEMORY;
+      goto out;
+    }
     num_entries++;
   }
 
   output->num_entries = num_entries;
-  output->entries =
-      amqp_pool_alloc(pool, num_entries * sizeof(amqp_field_value_t));
-  /* nullptr is legitimate if we requested a zero-length block. */
-  if (output->entries == nullptr) {
-    if (num_entries == 0) {
-      res = AMQP_STATUS_OK;
-    } else {
+  {
+    size_t entries_size;
+    if (ckd_mul(&entries_size, (size_t)num_entries,
+                sizeof(amqp_field_value_t))) {
       res = AMQP_STATUS_NO_MEMORY;
+      goto out;
     }
-    goto out;
-  }
+    output->entries = amqp_pool_alloc(pool, entries_size);
+    /* nullptr is legitimate if we requested a zero-length block. */
+    if (output->entries == nullptr) {
+      if (num_entries == 0) {
+        res = AMQP_STATUS_OK;
+      } else {
+        res = AMQP_STATUS_NO_MEMORY;
+      }
+      goto out;
+    }
 
-  memcpy(output->entries, entries, num_entries * sizeof(amqp_field_value_t));
+    memcpy(output->entries, entries, entries_size);
+  }
   res = AMQP_STATUS_OK;
 
 out:
@@ -108,16 +137,23 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  if (tablesize + *offset > encoded.len) {
+  if (ckd_add(&limit, *offset, (size_t)tablesize) || limit > encoded.len) {
     return AMQP_STATUS_BAD_AMQP_DATA;
   }
 
-  entries = calloc(allocated_entries, sizeof(amqp_table_entry_t));
+  {
+    size_t entries_size;
+    if (allocated_entries <= 0 ||
+        ckd_mul(&entries_size, (size_t)allocated_entries,
+                sizeof(amqp_table_entry_t))) {
+      return AMQP_STATUS_NO_MEMORY;
+    }
+    entries = calloc(1, entries_size);
+  }
   if (entries == nullptr) {
     return AMQP_STATUS_NO_MEMORY;
   }
 
-  limit = *offset + tablesize;
   while (*offset < limit) {
     uint8_t keylen;
 
@@ -128,14 +164,23 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
 
     if (num_entries >= allocated_entries) {
       void *newentries;
-      allocated_entries = allocated_entries * 2;
-      newentries =
-          realloc(entries, allocated_entries * sizeof(amqp_table_entry_t));
+      size_t next_allocated_entries;
+      size_t next_entries_size;
       res = AMQP_STATUS_NO_MEMORY;
+      if (allocated_entries <= 0 ||
+          ckd_mul(&next_allocated_entries, (size_t)allocated_entries,
+                  (size_t)2) ||
+          next_allocated_entries > (size_t)INT_MAX ||
+          ckd_mul(&next_entries_size, next_allocated_entries,
+                  sizeof(amqp_table_entry_t))) {
+        goto out;
+      }
+      newentries = realloc(entries, next_entries_size);
       if (newentries == nullptr) {
         goto out;
       }
 
+      allocated_entries = (int)next_allocated_entries;
       entries = newentries;
     }
 
@@ -151,23 +196,34 @@ static int amqp_decode_table_internal(amqp_bytes_t encoded, amqp_pool_t *pool,
       goto out;
     }
 
+    if (num_entries == INT_MAX) {
+      res = AMQP_STATUS_NO_MEMORY;
+      goto out;
+    }
     num_entries++;
   }
 
   output->num_entries = num_entries;
-  output->entries =
-      amqp_pool_alloc(pool, num_entries * sizeof(amqp_table_entry_t));
-  /* nullptr is legitimate if we requested a zero-length block. */
-  if (output->entries == nullptr) {
-    if (num_entries == 0) {
-      res = AMQP_STATUS_OK;
-    } else {
+  {
+    size_t entries_size;
+    if (ckd_mul(&entries_size, (size_t)num_entries,
+                sizeof(amqp_table_entry_t))) {
       res = AMQP_STATUS_NO_MEMORY;
+      goto out;
     }
-    goto out;
-  }
+    output->entries = amqp_pool_alloc(pool, entries_size);
+    /* nullptr is legitimate if we requested a zero-length block. */
+    if (output->entries == nullptr) {
+      if (num_entries == 0) {
+        res = AMQP_STATUS_OK;
+      } else {
+        res = AMQP_STATUS_NO_MEMORY;
+      }
+      goto out;
+    }
 
-  memcpy(output->entries, entries, num_entries * sizeof(amqp_table_entry_t));
+    memcpy(output->entries, entries, entries_size);
+  }
   res = AMQP_STATUS_OK;
 
 out:
