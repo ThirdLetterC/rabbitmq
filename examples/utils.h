@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef librabbitmq_examples_utils_h
-#define librabbitmq_examples_utils_h
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,5 +16,3 @@ extern void amqp_dump(void const *buffer, size_t len);
 
 extern uint64_t now_microseconds();
 extern void microsleep(int usec);
-
-#endif

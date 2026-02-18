@@ -5,8 +5,7 @@
 
 #include "rabbitmq/export.h"
 
-#ifndef RABBITMQ_C_RABBITMQ_C_H
-#define RABBITMQ_C_RABBITMQ_C_H
+#pragma once
 
 /** \cond HIDE_FROM_DOXYGEN */
 
@@ -2446,4 +2445,4 @@ amqp_rpc_reply_t AMQP_CALL amqp_publisher_confirm_wait(
 
 AMQP_END_DECLS
 
-#endif /* RABBITMQ_C_RABBITMQ_C_H */
+

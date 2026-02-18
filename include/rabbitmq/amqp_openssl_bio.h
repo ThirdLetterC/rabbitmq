@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef AMQP_OPENSSL_BIO
-#define AMQP_OPENSSL_BIO
+#pragma once
 
 // Use OpenSSL v1.1.1 API.
 #define OPENSSL_API_COMPAT 10101
@@ -16,5 +15,3 @@ void amqp_openssl_bio_destroy();
 typedef const BIO_METHOD *BIO_METHOD_PTR;
 
 BIO_METHOD_PTR amqp_openssl_bio();
-
-#endif /* ifndef AMQP_OPENSSL_BIO */

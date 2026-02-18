@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef AMQP_TABLE_H
-#define AMQP_TABLE_H
+#pragma once
 
 #include "amqp_private.h"
 #include "rabbitmq//amqp.h"
@@ -53,4 +52,4 @@ amqp_table_entry_t amqp_table_construct_bool_entry(const char *key,
 amqp_table_entry_t *amqp_table_get_entry_by_key(const amqp_table_t *table,
                                                 const amqp_bytes_t key);
 
-#endif /* AMQP_TABLE_H */
+

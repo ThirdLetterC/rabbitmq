@@ -7,8 +7,7 @@
  * A TCP socket connection.
  */
 
-#ifndef RABBITMQ_C_TCP_SOCKET_H
-#define RABBITMQ_C_TCP_SOCKET_H
+#pragma once
 
 #include "rabbitmq/amqp.h"
 #include "rabbitmq/export.h"
@@ -44,4 +43,4 @@ void AMQP_CALL amqp_tcp_socket_set_sockfd(amqp_socket_t *self, int sockfd);
 
 AMQP_END_DECLS
 
-#endif /* RABBITMQ_C_TCP_SOCKET_H */
+

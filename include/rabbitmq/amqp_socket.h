@@ -5,8 +5,7 @@
  * An abstract socket interface.
  */
 
-#ifndef AMQP_SOCKET_H
-#define AMQP_SOCKET_H
+#pragma once
 
 #include "amqp_private.h"
 #include "amqp_time.h"
@@ -162,5 +161,3 @@ int sasl_mechanism_in_list(amqp_bytes_t mechanisms,
 int amqp_merge_capabilities(const amqp_table_t *base, const amqp_table_t *add,
                             amqp_table_t *result, amqp_pool_t *pool);
 AMQP_END_DECLS
-
-#endif /* AMQP_SOCKET_H */
