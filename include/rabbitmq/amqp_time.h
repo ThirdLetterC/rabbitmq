@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef AMQP_TIMER_H
-#define AMQP_TIMER_H
+#pragma once
 
 #include <stdint.h>
 #include <sys/time.h>
@@ -95,4 +94,4 @@ int amqp_time_has_past(amqp_time_t time);
 amqp_time_t amqp_time_first(amqp_time_t l, amqp_time_t r);
 
 int amqp_time_equal(amqp_time_t l, amqp_time_t r);
-#endif /* AMQP_TIMER_H */
+

@@ -4,8 +4,7 @@
 /* Generated code. Do not edit. Edit and re-run codegen.py instead. */
 
 /** @file rabbitmq-c/framing.h */
-#ifndef RABBITMQ_C_FRAMING_H
-#define RABBITMQ_C_FRAMING_H
+#pragma once
 
 #include "rabbitmq/amqp.h"
 #include "rabbitmq/export.h"
@@ -1178,4 +1177,4 @@ amqp_confirm_select_ok_t *AMQP_CALL
 
 AMQP_END_DECLS
 
-#endif /* RABBITMQ_C_FRAMING_H */
+

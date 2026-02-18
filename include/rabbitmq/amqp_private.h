@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef librabbitmq_amqp_private_h
-#define librabbitmq_amqp_private_h
+#pragma once
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -300,4 +299,3 @@ static inline amqp_rpc_reply_t amqp_rpc_reply_error(amqp_status_enum status) {
 int amqp_send_frame_inner(amqp_connection_state_t state,
                           const amqp_frame_t *frame, int flags,
                           amqp_time_t deadline);
-#endif

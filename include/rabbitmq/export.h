@@ -1,8 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#ifndef RABBITMQ_C_EXPORT_H
-#define RABBITMQ_C_EXPORT_H
+#pragma once
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 #if defined(AMQP_STATIC)
@@ -26,5 +25,3 @@
 #endif
 
 #define AMQP_DEPRECATED_EXPORT AMQP_EXPORT AMQP_DEPRECATED
-
-#endif /* RABBITMQ_C_EXPORT_H */

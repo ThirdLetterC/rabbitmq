@@ -3,8 +3,7 @@
 
 /** \file */
 
-#ifndef RABBITMQ_C_SSL_SOCKET_H
-#define RABBITMQ_C_SSL_SOCKET_H
+#pragma once
 
 #include "rabbitmq/amqp.h"
 #include "rabbitmq/export.h"
@@ -302,4 +301,4 @@ int AMQP_CALL amqp_uninitialize_ssl_library();
 
 AMQP_END_DECLS
 
-#endif /* RABBITMQ_C_SSL_SOCKET_H */
+
