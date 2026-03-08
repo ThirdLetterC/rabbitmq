@@ -16,3 +16,5 @@ extern void amqp_dump(void const *buffer, size_t len);
 
 extern uint64_t now_microseconds();
 extern void microsleep(int usec);
+extern int parse_int_arg(const char *value, const char *name, int min_value,
+                         int max_value);

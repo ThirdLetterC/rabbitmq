@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: mit
 
 #include <ctype.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +21,19 @@ void die(const char *fmt, ...) {
   va_end(ap);
   fprintf(stderr, "\n");
   exit(1);
+}
+
+int parse_int_arg(const char *value, const char *name, int min_value,
+                  int max_value) {
+  char *end = nullptr;
+  long parsed = strtol(value, &end, 10);
+
+  if (value == end || *end != '\0' || parsed < min_value ||
+      parsed > max_value || parsed < INT_MIN || parsed > INT_MAX) {
+    die("invalid %s: %s", name, value);
+  }
+
+  return (int)parsed;
 }
 
 void die_on_error(int x, char const *context) {

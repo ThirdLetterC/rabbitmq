@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "common.h"
@@ -22,6 +23,157 @@
 static constexpr size_t max_auth_token_len = 128;
 static constexpr char username_prefix[] = "username:";
 static constexpr char password_prefix[] = "password:";
+
+static char *amqp_url;
+static char *amqp_server;
+static int amqp_port = -1;
+static char *amqp_vhost;
+static char *amqp_username;
+static char *amqp_password;
+static int amqp_heartbeat = 0;
+static char *amqp_authfile;
+#ifdef WITH_SSL
+static int amqp_ssl = 0;
+static char *amqp_cacert = nullptr;
+static char *amqp_key = nullptr;
+static char *amqp_cert = nullptr;
+#endif /* WITH_SSL */
+
+static char *amqp_url_storage = nullptr;
+static bool amqp_url_storage_owned = false;
+static char *amqp_server_host = nullptr;
+static bool amqp_server_host_owned = false;
+static bool amqp_username_owned = false;
+static bool amqp_password_owned = false;
+static bool cleanup_registered = false;
+
+static void secure_clear(void *ptr, size_t len) {
+  volatile unsigned char *bytes = ptr;
+
+  if (ptr == nullptr) {
+    return;
+  }
+
+  while (len > 0) {
+    *bytes++ = 0;
+    --len;
+  }
+}
+
+static void release_owned_string(char **value, bool *owned, bool scrub) {
+  if (*owned && *value != nullptr) {
+    if (scrub) {
+      secure_clear(*value, strlen(*value));
+    }
+    free(*value);
+  }
+
+  *value = nullptr;
+  *owned = false;
+}
+
+static void cleanup_auth_credentials() {
+  release_owned_string(&amqp_username, &amqp_username_owned, true);
+  release_owned_string(&amqp_password, &amqp_password_owned, true);
+}
+
+static void cleanup_connection_inputs() {
+  cleanup_auth_credentials();
+  release_owned_string(&amqp_url_storage, &amqp_url_storage_owned, true);
+  release_owned_string(&amqp_server_host, &amqp_server_host_owned, false);
+}
+
+static void register_cleanup_once() {
+  if (!cleanup_registered) {
+    if (atexit(cleanup_connection_inputs) != 0) {
+      die("Could not register credential cleanup");
+    }
+    cleanup_registered = true;
+  }
+}
+
+static void enforce_authfile_permissions(int fd, const char *path) {
+  struct stat st;
+
+  if (fstat(fd, &st) != 0) {
+    auto err = errno;
+    close(fd);
+    die_errno(err, "Could not inspect auth data file %s", path);
+  }
+
+  if (!S_ISREG(st.st_mode)) {
+    close(fd);
+    die("Auth data file %s is not a regular file", path);
+  }
+
+  if ((st.st_mode & (S_IRWXG | S_IRWXO)) != 0) {
+    close(fd);
+    die("Auth data file %s must not be accessible by group or other users",
+        path);
+  }
+}
+
+static FILE *open_authfile(const char *path) {
+  FILE *fp;
+  int fd;
+  int flags = O_RDONLY;
+
+#ifdef O_CLOEXEC
+  flags |= O_CLOEXEC;
+#endif
+#ifdef O_NOFOLLOW
+  flags |= O_NOFOLLOW;
+#endif
+
+  fd = open(path, flags);
+  if (fd < 0) {
+    die_errno(errno, "Could not read auth data file %s", path);
+  }
+
+  enforce_authfile_permissions(fd, path);
+
+  fp = fdopen(fd, "r");
+  if (fp == nullptr) {
+    auto err = errno;
+    close(fd);
+    die_errno(err, "Could not read auth data file %s", path);
+  }
+
+  return fp;
+}
+
+static char *allocate_auth_value() {
+  auto value = (char *)calloc(max_auth_token_len, sizeof(char));
+  if (value == nullptr) {
+    die("Out of memory");
+  }
+  return value;
+}
+
+static void parse_auth_line(const char *field_name, const char *prefix,
+                            char *destination, char *token) {
+  auto prefix_len = strlen(prefix);
+  auto value = token + prefix_len;
+  size_t value_len;
+
+  if (strncmp(token, prefix, prefix_len) != 0) {
+    die("Malformed auth file (missing %s)", field_name);
+  }
+
+  value_len = strlen(value);
+  if (value_len == 0 || value[value_len - 1] != '\n') {
+    die("%s too long", field_name);
+  }
+
+  if (value_len > max_auth_token_len) {
+    die("%s too long", field_name);
+  }
+
+  if (value_len > 1) {
+    memcpy(destination, value, value_len - 1);
+  }
+  destination[value_len - 1] = '\0';
+}
 
 void die(const char *fmt, ...) {
   va_list ap;
@@ -123,21 +275,6 @@ void die_rpc(amqp_rpc_reply_t r, const char *fmt, ...) {
   exit(1);
 }
 
-static char *amqp_url;
-static char *amqp_server;
-static int amqp_port = -1;
-static char *amqp_vhost;
-static char *amqp_username;
-static char *amqp_password;
-static int amqp_heartbeat = 0;
-static char *amqp_authfile;
-#ifdef WITH_SSL
-static int amqp_ssl = 0;
-static char *amqp_cacert = "/etc/ssl/certs/cacert.pem";
-static char *amqp_key = nullptr;
-static char *amqp_cert = nullptr;
-#endif /* WITH_SSL */
-
 const char *connect_options_title = "Connection options";
 struct poptOption connect_options[] = {
     {"url", 'u', POPT_ARG_STRING, &amqp_url, 0, "the AMQP URL to connect to",
@@ -167,52 +304,46 @@ struct poptOption connect_options[] = {
     {nullptr, '\0', 0, nullptr, 0, nullptr, nullptr}};
 
 void read_authfile(const char *path) {
-  size_t n;
   FILE *fp = nullptr;
   char token[max_auth_token_len];
 
-  amqp_username = (char *)calloc(max_auth_token_len, sizeof(char));
-  amqp_password = (char *)calloc(max_auth_token_len, sizeof(char));
-  if (amqp_username == nullptr || amqp_password == nullptr) {
-    die("Out of memory");
-  } else if ((fp = fopen(path, "r")) == nullptr) {
-    die("Could not read auth data file %s", path);
-  }
+  register_cleanup_once();
+  cleanup_auth_credentials();
 
-  if (fgets(token, max_auth_token_len, fp) == nullptr ||
-      strncmp(token, username_prefix, strlen(username_prefix))) {
+  amqp_username = allocate_auth_value();
+  amqp_password = allocate_auth_value();
+  amqp_username_owned = true;
+  amqp_password_owned = true;
+  fp = open_authfile(path);
+
+  if (fgets(token, (int)sizeof(token), fp) == nullptr) {
+    fclose(fp);
     die("Malformed auth file (missing username)");
   }
-  strncpy(amqp_username, &token[strlen(username_prefix)], max_auth_token_len);
-  /* Missing newline means token was cut off */
-  n = strlen(amqp_username);
-  if (amqp_username[n - 1] != '\n') {
-    die("Username too long");
-  } else {
-    amqp_username[n - 1] = '\0';
-  }
+  parse_auth_line("username", username_prefix, amqp_username, token);
 
-  if (fgets(token, max_auth_token_len, fp) == nullptr ||
-      strncmp(token, password_prefix, strlen(password_prefix))) {
+  if (fgets(token, (int)sizeof(token), fp) == nullptr) {
+    fclose(fp);
     die("Malformed auth file (missing password)");
   }
-  strncpy(amqp_password, &token[strlen(password_prefix)], max_auth_token_len);
-  /* Missing newline means token was cut off */
-  n = strlen(amqp_password);
-  if (amqp_password[n - 1] != '\n') {
-    die("Password too long");
-  } else {
-    amqp_password[n - 1] = '\0';
-  }
+  parse_auth_line("password", password_prefix, amqp_password, token);
 
   (void)fgetc(fp);
+  if (ferror(fp) != 0) {
+    auto err = errno;
+    fclose(fp);
+    die_errno(err, "Could not read auth data file %s", path);
+  }
   if (!feof(fp)) {
+    fclose(fp);
     die("Malformed auth file (trailing data)");
   }
   fclose(fp);
 }
 
 static void init_connection_info(struct amqp_connection_info *ci) {
+  register_cleanup_once();
+
   ci->user = nullptr;
   ci->password = nullptr;
   ci->host = nullptr;
@@ -222,9 +353,17 @@ static void init_connection_info(struct amqp_connection_info *ci) {
 
   amqp_default_connection_info(ci);
 
-  if (amqp_url)
-    die_amqp_error(amqp_parse_url(strdup(amqp_url), ci), "Parsing URL '%s'",
+  if (amqp_url) {
+    cleanup_connection_inputs();
+
+    amqp_url_storage = strdup(amqp_url);
+    if (amqp_url_storage == nullptr) {
+      die("Out of memory");
+    }
+    amqp_url_storage_owned = true;
+    die_amqp_error(amqp_parse_url(amqp_url_storage, ci), "Parsing URL '%s'",
                    amqp_url);
+  }
 
   if (amqp_server) {
     char *colon;
@@ -251,12 +390,15 @@ static void init_connection_info(struct amqp_connection_info *ci) {
         die("server host is too long");
       }
 
-      ci->host = (char *)calloc(host_size, sizeof(char));
-      if (ci->host == nullptr) {
+      release_owned_string(&amqp_server_host, &amqp_server_host_owned, false);
+      amqp_server_host = (char *)calloc(host_size, sizeof(char));
+      if (amqp_server_host == nullptr) {
         die("Out of memory");
       }
-      memcpy(ci->host, amqp_server, host_len);
-      ci->host[host_len] = 0;
+      amqp_server_host_owned = true;
+      memcpy(amqp_server_host, amqp_server, host_len);
+      amqp_server_host[host_len] = 0;
+      ci->host = amqp_server_host;
 
       if (amqp_port >= 0) {
         die("both --server and --port options specify server port");
@@ -337,6 +479,16 @@ static void init_connection_info(struct amqp_connection_info *ci) {
   if (amqp_heartbeat < 0) {
     die("--heartbeat must be a positive value");
   }
+
+#ifdef WITH_SSL
+  if (ci->ssl) {
+    if ((amqp_key == nullptr) != (amqp_cert == nullptr)) {
+      die("--key and --cert must be provided together");
+    }
+  } else if (amqp_key != nullptr || amqp_cert != nullptr || amqp_cacert != nullptr) {
+    die("TLS options require an SSL/TLS connection");
+  }
+#endif
 }
 
 amqp_connection_state_t make_connection() {
@@ -354,10 +506,15 @@ amqp_connection_state_t make_connection() {
       die("creating SSL/TLS socket");
     }
     if (amqp_cacert) {
-      amqp_ssl_socket_set_cacert(socket, amqp_cacert);
+      die_amqp_error(amqp_ssl_socket_set_cacert(socket, amqp_cacert),
+                     "loading CA certificate %s", amqp_cacert);
+    } else {
+      die_amqp_error(amqp_ssl_socket_enable_default_verify_paths(socket),
+                     "loading system CA certificates");
     }
     if (amqp_key) {
-      amqp_ssl_socket_set_key(socket, amqp_cert, amqp_key);
+      die_amqp_error(amqp_ssl_socket_set_key(socket, amqp_cert, amqp_key),
+                     "loading client certificate/key");
     }
 #else
     die("librabbitmq was not built with SSL/TLS support");
@@ -378,6 +535,7 @@ amqp_connection_state_t make_connection() {
   if (!amqp_channel_open(conn, 1)) {
     die_rpc(amqp_get_rpc_reply(conn), "opening channel");
   }
+  cleanup_connection_inputs();
   return conn;
 }
 
@@ -441,7 +599,13 @@ void write_all(int fd, amqp_bytes_t data) {
   while (data.len > 0) {
     ssize_t res = write(fd, data.bytes, data.len);
     if (res < 0) {
+      if (errno == EINTR) {
+        continue;
+      }
       die_errno(errno, "write");
+    }
+    if (res == 0) {
+      die("write returned zero bytes");
     }
 
     data.len -= res;

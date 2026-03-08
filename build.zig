@@ -343,6 +343,7 @@ pub fn build(b: *std.Build) void {
             .{ .name = "test_basic", .file = "tests/test_basic.c" },
             .{ .name = "test_sasl_mechanism", .file = "tests/test_sasl_mechanism.c" },
             .{ .name = "test_merge_capabilities", .file = "tests/test_merge_capabilities.c" },
+            .{ .name = "test_timeouts", .file = "tests/test_timeouts.c" },
         };
 
         for (tests) |test_bin| {

@@ -1,6 +1,7 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -84,7 +85,17 @@ int main(int argc, const char **argv) {
   if (headers) {
     int num = 0;
     for (pos = headers; *pos; pos++) {
-      num++;
+      if (strchr(*pos, ':') != nullptr) {
+        if (num == INT_MAX) {
+          fprintf(stderr, "Too many headers specified\n");
+          return 1;
+        }
+        num++;
+      } else {
+        fprintf(stderr,
+                "Ignored header definition missing ':' delimiter in \"%s\"\n",
+                *pos);
+      }
     }
 
     if (num > 0) {
@@ -105,10 +116,6 @@ int main(int argc, const char **argv) {
           table->entries[i].value.kind = AMQP_FIELD_KIND_UTF8;
           table->entries[i].value.value.bytes = amqp_cstring_bytes(colon);
           i++;
-        } else {
-          fprintf(stderr,
-                  "Ignored header definition missing ':' delimiter in \"%s\"\n",
-                  *pos);
         }
       }
       props._flags |= AMQP_BASIC_HEADERS_FLAG;

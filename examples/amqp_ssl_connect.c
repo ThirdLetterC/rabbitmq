@@ -15,6 +15,26 @@
 
 #include "utils.h"
 
+[[noreturn]] static void usage() {
+  fprintf(stderr,
+          "Usage: amqp_ssl_connect host port timeout_sec "
+          "[cacert.pem|system] [engine engine_ID] [noverifypeer] "
+          "[noverifyhostname] [key.pem cert.pem]\n");
+  exit(1);
+}
+
+static int parse_decimal_int(const char *value, const char *name) {
+  char *end = nullptr;
+  long parsed = strtol(value, &end, 10);
+
+  if (value == end || *end != '\0' || parsed < INT32_MIN ||
+      parsed > INT32_MAX) {
+    die("invalid %s: %s", name, value);
+  }
+
+  return (int)parsed;
+}
+
 int main(int argc, char const *const *argv) {
   char const *hostname;
   int port;
@@ -24,18 +44,17 @@ int main(int argc, char const *const *argv) {
   struct timeval tval;
   struct timeval *tv;
 
-  if (argc < 3) {
-    fprintf(stderr,
-            "Usage: amqp_ssl_connect host port timeout_sec "
-            "[cacert.pem [engine engine_ID] [verifypeer] [verifyhostname] "
-            "[key.pem cert.pem]]\n");
-    return 1;
+  if (argc < 4) {
+    usage();
   }
 
   hostname = argv[1];
-  port = atoi(argv[2]);
+  port = parse_decimal_int(argv[2], "port");
+  if (port <= 0 || port > UINT16_MAX) {
+    die("invalid port: %s", argv[2]);
+  }
 
-  timeout = atoi(argv[3]);
+  timeout = parse_decimal_int(argv[3], "timeout");
   if (timeout > 0) {
     tv = &tval;
 
@@ -52,30 +71,53 @@ int main(int argc, char const *const *argv) {
     die("creating SSL/TLS socket");
   }
 
-  amqp_ssl_socket_set_verify_peer(socket, 0);
-  amqp_ssl_socket_set_verify_hostname(socket, 0);
+  int nextarg = 4;
+  if (argc > nextarg && strcmp(argv[nextarg], "engine") != 0 &&
+      strcmp(argv[nextarg], "noverifypeer") != 0 &&
+      strcmp(argv[nextarg], "noverifyhostname") != 0) {
+    if (strcmp(argv[nextarg], "system") == 0) {
+      die_on_error(amqp_ssl_socket_enable_default_verify_paths(socket),
+                   "loading system CA certificates");
+    } else {
+      die_on_error(amqp_ssl_socket_set_cacert(socket, argv[nextarg]),
+                   "setting CA certificate");
+    }
+    nextarg++;
+  } else {
+    die_on_error(amqp_ssl_socket_enable_default_verify_paths(socket),
+                 "loading system CA certificates");
+  }
 
-  if (argc > 5) {
-    int nextarg = 5;
-    die_on_error(amqp_ssl_socket_set_cacert(socket, argv[4]),
-                 "setting CA certificate");
-    if (argc > nextarg && !strcmp("engine", argv[nextarg])) {
-      amqp_set_ssl_engine(argv[++nextarg]);
+  while (argc > nextarg) {
+    if (!strcmp("engine", argv[nextarg])) {
+      if (argc <= nextarg + 1) {
+        usage();
+      }
+      die_on_error(amqp_set_ssl_engine(argv[nextarg + 1]), "setting SSL engine");
+      nextarg += 2;
+      continue;
+    }
+
+    if (!strcmp("noverifypeer", argv[nextarg])) {
+      amqp_ssl_socket_set_verify_peer(socket, 0);
       nextarg++;
+      continue;
     }
-    if (argc > nextarg && !strcmp("verifypeer", argv[nextarg])) {
-      amqp_ssl_socket_set_verify_peer(socket, 1);
+
+    if (!strcmp("noverifyhostname", argv[nextarg])) {
+      amqp_ssl_socket_set_verify_hostname(socket, 0);
       nextarg++;
+      continue;
     }
-    if (argc > nextarg && !strcmp("verifyhostname", argv[nextarg])) {
-      amqp_ssl_socket_set_verify_hostname(socket, 1);
-      nextarg++;
-    }
-    if (argc > nextarg + 1) {
-      die_on_error(
-          amqp_ssl_socket_set_key(socket, argv[nextarg + 1], argv[nextarg]),
-          "setting client key");
-    }
+
+    break;
+  }
+
+  if (argc - nextarg == 2) {
+    die_on_error(amqp_ssl_socket_set_key(socket, argv[nextarg + 1], argv[nextarg]),
+                 "setting client key");
+  } else if (argc != nextarg) {
+    usage();
   }
 
   die_on_error(amqp_socket_open_noblock(socket, hostname, port, tv),

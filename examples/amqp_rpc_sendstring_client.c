@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   }
 
   hostname = argv[1];
-  port = atoi(argv[2]);
+  port = parse_int_arg(argv[2], "port", 1, (int)UINT16_MAX);
   exchange = argv[3];
   routingkey = argv[4];
   messagebody = argv[5];

@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <stdckdint.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -1050,6 +1051,8 @@ int amqp_merge_capabilities(const amqp_table_t *base, const amqp_table_t *add,
   int res;
   amqp_pool_t temp_pool;
   amqp_table_t temp_result;
+  size_t total_entries;
+  size_t entries_size;
   assert(base != nullptr);
   assert(result != nullptr);
   assert(pool != nullptr);
@@ -1060,9 +1063,17 @@ int amqp_merge_capabilities(const amqp_table_t *base, const amqp_table_t *add,
 
   init_amqp_pool(&temp_pool, 4096);
   temp_result.num_entries = 0;
-  temp_result.entries =
-      amqp_pool_alloc(&temp_pool, sizeof(amqp_table_entry_t) *
-                                      (base->num_entries + add->num_entries));
+  if (base->num_entries < 0 || add->num_entries < 0) {
+    res = AMQP_STATUS_INVALID_PARAMETER;
+    goto error_out;
+  }
+  if (ckd_add(&total_entries, (size_t)base->num_entries,
+              (size_t)add->num_entries) ||
+      ckd_mul(&entries_size, total_entries, sizeof(amqp_table_entry_t))) {
+    res = AMQP_STATUS_NO_MEMORY;
+    goto error_out;
+  }
+  temp_result.entries = amqp_pool_alloc(&temp_pool, entries_size);
   if (nullptr == temp_result.entries) {
     res = AMQP_STATUS_NO_MEMORY;
     goto error_out;

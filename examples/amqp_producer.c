@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: mit
 
 #include <stdint.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -83,9 +84,9 @@ int main(int argc, char const *const *argv) {
   }
 
   hostname = argv[1];
-  port = atoi(argv[2]);
-  rate_limit = atoi(argv[3]);
-  message_count = atoi(argv[4]);
+  port = parse_int_arg(argv[2], "port", 1, (int)UINT16_MAX);
+  rate_limit = parse_int_arg(argv[3], "rate_limit", 0, INT_MAX);
+  message_count = parse_int_arg(argv[4], "message_count", 0, INT_MAX);
 
   conn = amqp_new_connection();
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: mit
 
 #include <stdint.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,10 +33,10 @@ int main(int argc, char const *const *argv) {
   if (argc > 3) {
     tv = &tval;
 
-    tv->tv_sec = atoi(argv[3]);
+    tv->tv_sec = parse_int_arg(argv[3], "timeout_sec", 0, INT_MAX);
 
     if (argc > 4) {
-      tv->tv_usec = atoi(argv[4]);
+      tv->tv_usec = parse_int_arg(argv[4], "timeout_usec", 0, 999999);
     } else {
       tv->tv_usec = 0;
     }
@@ -45,7 +46,7 @@ int main(int argc, char const *const *argv) {
   }
 
   hostname = argv[1];
-  port = atoi(argv[2]);
+  port = parse_int_arg(argv[2], "port", 1, (int)UINT16_MAX);
 
   conn = amqp_new_connection();
 

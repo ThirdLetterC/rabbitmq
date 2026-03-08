@@ -25,7 +25,7 @@ int main(int argc, char const *const *argv) {
   }
 
   hostname = argv[1];
-  port = atoi(argv[2]);
+  port = parse_int_arg(argv[2], "port", 1, (int)UINT16_MAX);
   exchange = argv[3];
   bindingkey = argv[4];
   queue = argv[5];

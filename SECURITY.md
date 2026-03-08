@@ -98,8 +98,9 @@ still affect memory use and throughput.
   `amqp_ssl_socket_enable_default_verify_paths()` or
   `amqp_ssl_socket_set_cacert()` before connecting.
 - The sample program [examples/amqp_ssl_connect.c](examples/amqp_ssl_connect.c)
-  disables peer and hostname verification until the user explicitly turns them
-  back on. Treat it as a debugging example, not a production baseline.
+  now loads system trust roots by default and keeps peer and hostname
+  verification enabled unless the user explicitly passes `noverifypeer` or
+  `noverifyhostname` for debugging.
 - Only the `PLAIN` and `EXTERNAL` SASL methods are implemented.
 - Heartbeat support is partial. Per the public API docs, heartbeats are
   serviced during publish and frame-wait paths, not as a general background
@@ -116,8 +117,10 @@ still affect memory use and throughput.
   but not secret-safe against local inspection of process arguments or poorly
   protected files.
 - The CLI helper in [tools/common.c](tools/common.c)
-  defaults to `guest` / `guest`, and its auth-file loader does not enforce file
-  permissions. Secure deployment policy belongs to the operator.
+  defaults to `guest` / `guest`. It now rejects auth files that are readable or
+  writable by group or other users, and it scrubs auth-file credentials after
+  connection setup, but credentials supplied via argv or embedded in URLs still
+  remain exposed to local inspection.
 - The library validates frame structure and table encoding, but it does not
   make authorization decisions about exchanges, queues, routing keys, or
   message content. Broker ACLs and application validation remain out of scope.
@@ -128,7 +131,7 @@ still affect memory use and throughput.
 - `tools/` builds require `popt` and expose broker operations such as publish,
   consume, get, declare-queue, and delete-queue.
 - The tools can read credentials from `--authfile`, but they do not scrub those
-  buffers after use.
+  buffers after use if the credentials came from argv or AMQP URLs.
 
 Review example and tool defaults before using them in automation or
 production-like environments.

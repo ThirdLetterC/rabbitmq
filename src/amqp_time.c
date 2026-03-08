@@ -64,7 +64,8 @@ int amqp_time_from_now(amqp_time_t *time, const struct timeval *timeout) {
     return AMQP_STATUS_OK;
   }
 
-  if (timeout->tv_sec < 0 || timeout->tv_usec < 0) {
+  if (timeout->tv_sec < 0 || timeout->tv_usec < 0 ||
+      timeout->tv_usec >= 1'000'000) {
     return AMQP_STATUS_INVALID_PARAMETER;
   }
 
