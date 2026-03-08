@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "rabbitmq/amqp.h"
 #include "rabbitmq/tcp_socket.h"
