@@ -51,5 +51,3 @@ amqp_table_entry_t amqp_table_construct_bool_entry(const char *key,
  */
 amqp_table_entry_t *amqp_table_get_entry_by_key(const amqp_table_t *table,
                                                 const amqp_bytes_t key);
-
-

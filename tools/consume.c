@@ -9,8 +9,8 @@
 #include "common.h"
 #include "process.h"
 
-static constexpr int max_listen_keys = 1'024;
-static constexpr char listen_keys_delimiter[] = ",";
+static constexpr int max_listen_keys =
+    1'024; static constexpr char listen_keys_delimiter[] = ",";
 
 /* Convert a amqp_bytes_t to an escaped string form for printing.  We
    use the same escaping conventions as rabbitmqctl. */
@@ -131,9 +131,9 @@ static amqp_bytes_t setup_queue(amqp_connection_state_t conn, char *queue,
 
 static constexpr int amqp_consume_max_prefetch_count = 65'535;
 
-static void do_consume(amqp_connection_state_t conn, amqp_bytes_t queue,
-                       int no_ack, int count, int prefetch_count,
-                       const char *const *argv) {
+    static void
+    do_consume(amqp_connection_state_t conn, amqp_bytes_t queue, int no_ack,
+               int count, int prefetch_count, const char *const *argv) {
   int i;
 
   /* If there is a limit, set the qos to match */

@@ -300,5 +300,3 @@ AMQP_DEPRECATED_EXPORT
 int AMQP_CALL amqp_uninitialize_ssl_library();
 
 AMQP_END_DECLS
-
-

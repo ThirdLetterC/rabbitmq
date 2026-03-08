@@ -1,8 +1,8 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "rabbitmq/amqp.h"
@@ -10,7 +10,7 @@
 
 #include "utils.h"
 
-static constexpr int summary_every_us = 1'000'000;
+static constexpr int summary_every_us = 1 '000' 000;
 
 static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
                        int rate_limit, int message_count) {

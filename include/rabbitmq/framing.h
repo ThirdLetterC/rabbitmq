@@ -1176,5 +1176,3 @@ amqp_confirm_select_ok_t *AMQP_CALL
     amqp_confirm_select(amqp_connection_state_t state, amqp_channel_t channel);
 
 AMQP_END_DECLS
-
-

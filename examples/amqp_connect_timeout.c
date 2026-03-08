@@ -1,8 +1,8 @@
 // Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
 // SPDX-License-Identifier: mit
 
-#include <stdint.h>
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include "rabbitmq/amqp.h"

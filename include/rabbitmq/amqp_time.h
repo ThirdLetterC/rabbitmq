@@ -94,4 +94,3 @@ int amqp_time_has_past(amqp_time_t time);
 amqp_time_t amqp_time_first(amqp_time_t l, amqp_time_t r);
 
 int amqp_time_equal(amqp_time_t l, amqp_time_t r);
-

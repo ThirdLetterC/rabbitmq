@@ -11,7 +11,7 @@
 
 #include "utils.h"
 
-static constexpr int summary_every_us = 1'000'000;
+static constexpr int summary_every_us = 1 '000' 000;
 
 static void run(amqp_connection_state_t conn) {
   uint64_t start_time = now_microseconds();

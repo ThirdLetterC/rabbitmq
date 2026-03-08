@@ -15,10 +15,15 @@
 #include "rabbitmq/amqp_socket.h"
 #include "rabbitmq/amqp_time.h"
 
-static constexpr int error_mask = 0b0000'0000'1111'1111;
-static constexpr int error_category_mask = 0b1111'1111'0000'0000;
+static constexpr int error_mask =
+    0b0000 '0000' 1111'1111; static constexpr int error_category_mask =
+        0b1111 '1111' 0000'0000;
 
-enum error_category_enum_ { EC_base = 0, EC_tcp = 1, EC_ssl = 2 };
+    enum error_category_enum_ {
+      EC_base = 0,
+      EC_tcp = 1,
+      EC_ssl = 2
+    };
 
 static const char *base_error_strings[] = {
     /* AMQP_STATUS_OK 0x0 */
@@ -343,7 +348,7 @@ int amqp_set_handshake_timeout(amqp_connection_state_t state,
                                const struct timeval *timeout) {
   if (timeout) {
     if (timeout->tv_sec < 0 || timeout->tv_usec < 0 ||
-        timeout->tv_usec >= 1'000'000) {
+        timeout->tv_usec >= 1 '000' 000) {
       return AMQP_STATUS_INVALID_PARAMETER;
     }
     state->internal_handshake_timeout = *timeout;
@@ -363,7 +368,7 @@ int amqp_set_rpc_timeout(amqp_connection_state_t state,
                          const struct timeval *timeout) {
   if (timeout) {
     if (timeout->tv_sec < 0 || timeout->tv_usec < 0 ||
-        timeout->tv_usec >= 1'000'000) {
+        timeout->tv_usec >= 1 '000' 000) {
       return AMQP_STATUS_INVALID_PARAMETER;
     }
     state->rpc_timeout = &state->internal_rpc_timeout;

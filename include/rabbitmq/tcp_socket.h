@@ -42,5 +42,3 @@ AMQP_EXPORT
 void AMQP_CALL amqp_tcp_socket_set_sockfd(amqp_socket_t *self, int sockfd);
 
 AMQP_END_DECLS
-
-

@@ -485,7 +485,8 @@ static void init_connection_info(struct amqp_connection_info *ci) {
     if ((amqp_key == nullptr) != (amqp_cert == nullptr)) {
       die("--key and --cert must be provided together");
     }
-  } else if (amqp_key != nullptr || amqp_cert != nullptr || amqp_cacert != nullptr) {
+  } else if (amqp_key != nullptr || amqp_cert != nullptr ||
+             amqp_cacert != nullptr) {
     die("TLS options require an SSL/TLS connection");
   }
 #endif

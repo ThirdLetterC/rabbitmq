@@ -93,7 +93,8 @@ int main(int argc, char const *const *argv) {
       if (argc <= nextarg + 1) {
         usage();
       }
-      die_on_error(amqp_set_ssl_engine(argv[nextarg + 1]), "setting SSL engine");
+      die_on_error(amqp_set_ssl_engine(argv[nextarg + 1]),
+                   "setting SSL engine");
       nextarg += 2;
       continue;
     }
@@ -114,8 +115,9 @@ int main(int argc, char const *const *argv) {
   }
 
   if (argc - nextarg == 2) {
-    die_on_error(amqp_ssl_socket_set_key(socket, argv[nextarg + 1], argv[nextarg]),
-                 "setting client key");
+    die_on_error(
+        amqp_ssl_socket_set_key(socket, argv[nextarg + 1], argv[nextarg]),
+        "setting client key");
   } else if (argc != nextarg) {
     usage();
   }

@@ -21,9 +21,10 @@ char const *amqp_version() { return AMQP_VERSION_STRING; }
 uint32_t amqp_version_number() { return AMQP_VERSION; }
 
 void init_amqp_pool(amqp_pool_t *pool, size_t pagesize) {
-  pool->pagesize = pagesize ? pagesize : 4'096;
+  pool->pagesize = pagesize ? pagesize
+                            : 4'096;
 
-  pool->pages.num_blocks = 0;
+                              pool->pages.num_blocks = 0;
   pool->pages.blocklist = nullptr;
 
   pool->large_blocks.num_blocks = 0;

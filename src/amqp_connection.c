@@ -16,9 +16,9 @@
 #include "rabbitmq/amqp_time.h"
 #include "rabbitmq/tcp_socket.h"
 
-static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE = 65'536;
-static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE = 131'072;
-static constexpr int AMQP_DEFAULT_LOGIN_TIMEOUT_SEC = 12;
+static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE =
+    65'536; static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE =
+        131'072; static constexpr int AMQP_DEFAULT_LOGIN_TIMEOUT_SEC = 12;
 
 #define ENFORCE_STATE(statevec, statenum)                                   \
   {                                                                         \

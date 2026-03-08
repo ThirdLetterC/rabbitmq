@@ -2444,5 +2444,3 @@ amqp_rpc_reply_t AMQP_CALL amqp_publisher_confirm_wait(
     amqp_publisher_confirm_t *result);
 
 AMQP_END_DECLS
-
-

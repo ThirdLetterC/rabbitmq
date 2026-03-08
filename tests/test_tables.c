@@ -360,7 +360,8 @@ static void test_table_codec(FILE *out) {
 
 static constexpr size_t chunk_size = 4'096;
 
-static int compare_files(FILE *f1_in, FILE *f2_in) {
+    static int
+    compare_files(FILE * f1_in, FILE *f2_in) {
   char f1_buf[chunk_size];
   char f2_buf[chunk_size];
   int res;
