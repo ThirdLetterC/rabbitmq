@@ -4,7 +4,7 @@
 #pragma once
 
 #include "amqp_private.h"
-#include "rabbitmq//amqp.h"
+#include "rabbitmq/amqp.h"
 
 /**
  * Initializes a table entry with utf-8 string type value.

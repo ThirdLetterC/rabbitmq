@@ -11,7 +11,7 @@
 
 #include <inttypes.h>
 
-#include "rabbitmq//amqp.h"
+#include "rabbitmq/amqp.h"
 
 static void match_string(const char *what, const char *expect,
                          const char *got) {

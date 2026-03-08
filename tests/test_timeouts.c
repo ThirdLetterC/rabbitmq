@@ -4,8 +4,8 @@
 #include <assert.h>
 #include <sys/time.h>
 
-#include "rabbitmq//amqp.h"
-#include "rabbitmq//amqp_time.h"
+#include "rabbitmq/amqp.h"
+#include "rabbitmq/amqp_time.h"
 
 static void test_time_from_now_rejects_invalid_usec() {
   amqp_time_t deadline;
