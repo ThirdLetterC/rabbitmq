@@ -9,11 +9,12 @@
 uint64_t now_microseconds() {
   struct timeval tv;
   gettimeofday(&tv, nullptr);
-  return (uint64_t)tv.tv_sec * 1 '000' 000 + (uint64_t)tv.tv_usec;
+  return (uint64_t)tv.tv_sec * 1000000 + (uint64_t)tv.tv_usec;
 }
 
 void microsleep(int usec) {
   struct timespec req;
   req.tv_sec = 0;
-  req.tv_nsec = 1'000 * usec; nanosleep(&req, nullptr);
+  req.tv_nsec = 1000 * usec;
+  nanosleep(&req, nullptr);
 }

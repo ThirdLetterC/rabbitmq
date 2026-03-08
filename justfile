@@ -24,7 +24,7 @@ clean:
     {{zig}} build clean
 
 format:
-    zig fmt build.zig
+    {{zig}} fmt build.zig
     echo "Running clang-format..."
     find include src tests tools examples -type f \
         \( -name '*.c' -o -name '*.h' \) -print0 \

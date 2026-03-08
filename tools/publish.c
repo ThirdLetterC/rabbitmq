@@ -8,12 +8,11 @@
 
 #include "common.h"
 
-static constexpr size_t max_line_length =
-    32 * 1'024;
+static constexpr size_t max_line_length = 32 * 1024;
 
-    static void
-    do_publish(amqp_connection_state_t conn, char *exchange, char *routing_key,
-               amqp_basic_properties_t *props, amqp_bytes_t body) {
+static void do_publish(amqp_connection_state_t conn, char *exchange,
+                       char *routing_key, amqp_basic_properties_t *props,
+                       amqp_bytes_t body) {
   int res = amqp_basic_publish(conn, 1, cstring_bytes(exchange),
                                cstring_bytes(routing_key), 0, 0, props, body);
   die_amqp_error(res, "basic.publish");

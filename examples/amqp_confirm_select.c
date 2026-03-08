@@ -13,11 +13,10 @@
 
 #include <sys/time.h>
 
-static constexpr int summary_every_us = 5'000;
+static constexpr int summary_every_us = 5000;
 
-    static void
-    send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
-               int rate_limit, int message_count) {
+static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
+                       int rate_limit, int message_count) {
   uint64_t start_time = now_microseconds();
   int i;
   int sent = 0;
@@ -73,8 +72,8 @@ static constexpr int summary_every_us = 5'000;
 }
 
 static constexpr int consume_timeout_usec = 100;
-static constexpr int waiting_timeout_usec =
-    30 * 1'000; void wait_for_acks(amqp_connection_state_t conn) {
+static constexpr int waiting_timeout_usec = 30 * 1000;
+void wait_for_acks(amqp_connection_state_t conn) {
   uint64_t start_time = now_microseconds();
   struct timeval timeout = {0, consume_timeout_usec};
   uint64_t now = 0;

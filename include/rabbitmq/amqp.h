@@ -183,7 +183,7 @@ char const *AMQP_CALL amqp_version();
  *
  * \since v0.4.0
  */
-static constexpr int AMQP_DEFAULT_FRAME_SIZE = 131'072;
+static constexpr int AMQP_DEFAULT_FRAME_SIZE = 131072;
 
 /**
  * \def AMQP_DEFAULT_MAX_CHANNELS
@@ -197,7 +197,7 @@ static constexpr int AMQP_DEFAULT_FRAME_SIZE = 131'072;
  *
  * \since v0.4.0
  */
-static constexpr int AMQP_DEFAULT_MAX_CHANNELS = 2'047;
+static constexpr int AMQP_DEFAULT_MAX_CHANNELS = 2047;
 
 /**
  * \def AMQP_DEFAULT_HEARTBEAT

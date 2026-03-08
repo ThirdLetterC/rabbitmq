@@ -16,9 +16,9 @@
 #include "rabbitmq/amqp_time.h"
 #include "rabbitmq/tcp_socket.h"
 
-static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE =
-    65'536; static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE =
-        131'072; static constexpr int AMQP_DEFAULT_LOGIN_TIMEOUT_SEC = 12;
+static constexpr size_t AMQP_INITIAL_FRAME_POOL_PAGE_SIZE = 65536;
+static constexpr size_t AMQP_INITIAL_INBOUND_SOCK_BUFFER_SIZE = 131072;
+static constexpr int AMQP_DEFAULT_LOGIN_TIMEOUT_SEC = 12;
 
 #define ENFORCE_STATE(statevec, statenum)                                   \
   {                                                                         \
@@ -511,11 +511,8 @@ int amqp_send_frame_inner(amqp_connection_state_t state,
   amqp_bytes_t encoded;
   amqp_time_t next_timeout;
 
-  /* TODO: if the AMQP_SF_MORE socket optimization can be shown to work
-   * correctly, then this could be un-done so that body-frames are sent as 3
-   * send calls, getting rid of the copy of the body content, some testing
-   * would need to be done to see if this would actually a win for performance.
-   * */
+  /* Encode into a contiguous buffer so every socket backend sends a complete
+   * frame without relying on platform-specific scatter/gather behavior. */
   res = amqp_frame_to_bytes(frame, state->outbound_buffer, &encoded);
   if (AMQP_STATUS_OK != res) {
     return res;

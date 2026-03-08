@@ -56,6 +56,36 @@ struct amqp_ssl_socket_t {
   int internal_error;
 };
 
+static void amqp_ssl_socket_drop_connection(struct amqp_ssl_socket_t *self) {
+  if (self->ssl != nullptr) {
+    SSL_free(self->ssl);
+    self->ssl = nullptr;
+  }
+  if (-1 != self->sockfd) {
+    (void)amqp_os_socket_close(self->sockfd);
+    self->sockfd = -1;
+  }
+}
+
+static int amqp_ssl_socket_translate_error(struct amqp_ssl_socket_t *self,
+                                           int status) {
+  switch (self->internal_error) {
+    case SSL_ERROR_WANT_READ:
+      return AMQP_PRIVATE_STATUS_SOCKET_NEEDREAD;
+    case SSL_ERROR_WANT_WRITE:
+      return AMQP_PRIVATE_STATUS_SOCKET_NEEDWRITE;
+    case SSL_ERROR_ZERO_RETURN:
+      return AMQP_STATUS_CONNECTION_CLOSED;
+    case SSL_ERROR_SYSCALL:
+      if (status == 0) {
+        return AMQP_STATUS_CONNECTION_CLOSED;
+      }
+      return AMQP_STATUS_SOCKET_ERROR;
+    default:
+      return AMQP_STATUS_SSL_ERROR;
+  }
+}
+
 static ssize_t amqp_ssl_socket_send(void *base, const void *buf, size_t len,
                                     [[maybe_unused]] int flags) {
   struct amqp_ssl_socket_t *self = (struct amqp_ssl_socket_t *)base;
@@ -78,21 +108,10 @@ static ssize_t amqp_ssl_socket_send(void *base, const void *buf, size_t len,
   res = SSL_write(self->ssl, buf, (int)len);
   if (0 >= res) {
     self->internal_error = SSL_get_error(self->ssl, res);
-    /* TODO: Close connection if it isn't already? */
-    /* TODO: Possibly be more intelligent in reporting WHAT went wrong */
-    switch (self->internal_error) {
-      case SSL_ERROR_WANT_READ:
-        res = AMQP_PRIVATE_STATUS_SOCKET_NEEDREAD;
-        break;
-      case SSL_ERROR_WANT_WRITE:
-        res = AMQP_PRIVATE_STATUS_SOCKET_NEEDWRITE;
-        break;
-      case SSL_ERROR_ZERO_RETURN:
-        res = AMQP_STATUS_CONNECTION_CLOSED;
-        break;
-      default:
-        res = AMQP_STATUS_SSL_ERROR;
-        break;
+    res = amqp_ssl_socket_translate_error(self, res);
+    if (res != AMQP_PRIVATE_STATUS_SOCKET_NEEDREAD &&
+        res != AMQP_PRIVATE_STATUS_SOCKET_NEEDWRITE) {
+      amqp_ssl_socket_drop_connection(self);
     }
   } else {
     self->internal_error = 0;
@@ -121,19 +140,10 @@ static ssize_t amqp_ssl_socket_recv(void *base, void *buf, size_t len,
   received = SSL_read(self->ssl, buf, (int)len);
   if (0 >= received) {
     self->internal_error = SSL_get_error(self->ssl, received);
-    switch (self->internal_error) {
-      case SSL_ERROR_WANT_READ:
-        received = AMQP_PRIVATE_STATUS_SOCKET_NEEDREAD;
-        break;
-      case SSL_ERROR_WANT_WRITE:
-        received = AMQP_PRIVATE_STATUS_SOCKET_NEEDWRITE;
-        break;
-      case SSL_ERROR_ZERO_RETURN:
-        received = AMQP_STATUS_CONNECTION_CLOSED;
-        break;
-      default:
-        received = AMQP_STATUS_SSL_ERROR;
-        break;
+    received = amqp_ssl_socket_translate_error(self, received);
+    if (received != AMQP_PRIVATE_STATUS_SOCKET_NEEDREAD &&
+        received != AMQP_PRIVATE_STATUS_SOCKET_NEEDWRITE) {
+      amqp_ssl_socket_drop_connection(self);
     }
   }
 

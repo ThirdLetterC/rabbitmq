@@ -17,14 +17,14 @@ static constexpr uint8_t AMQP_PROTOCOL_VERSION_MINOR =
     9; /**< AMQP protocol version minor */
 static constexpr uint8_t AMQP_PROTOCOL_VERSION_REVISION =
     1; /**< AMQP protocol version revision */
-static constexpr uint16_t AMQP_PROTOCOL_PORT = 5'672; /**< Default AMQP Port */
+static constexpr uint16_t AMQP_PROTOCOL_PORT = 5672; /**< Default AMQP Port */
 static constexpr uint8_t AMQP_FRAME_METHOD = 1; /**< Constant: FRAME-METHOD */
 static constexpr uint8_t AMQP_FRAME_HEADER = 2; /**< Constant: FRAME-HEADER */
 static constexpr uint8_t AMQP_FRAME_BODY = 3;   /**< Constant: FRAME-BODY */
 static constexpr uint8_t AMQP_FRAME_HEARTBEAT =
     8; /**< Constant: FRAME-HEARTBEAT */
 static constexpr uint32_t AMQP_FRAME_MIN_SIZE =
-    4'096;                                     /**< Constant: FRAME-MIN-SIZE */
+    4096;                                      /**< Constant: FRAME-MIN-SIZE */
 static constexpr uint8_t AMQP_FRAME_END = 206; /**< Constant: FRAME-END */
 static constexpr uint16_t AMQP_REPLY_SUCCESS =
     200; /**< Constant: REPLY-SUCCESS */

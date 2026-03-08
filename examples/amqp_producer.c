@@ -10,7 +10,7 @@
 
 #include "utils.h"
 
-static constexpr int summary_every_us = 1 '000' 000;
+static constexpr int summary_every_us = 1000000;
 
 static void send_batch(amqp_connection_state_t conn, amqp_bytes_t queue_name,
                        int rate_limit, int message_count) {

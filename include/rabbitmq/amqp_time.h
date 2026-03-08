@@ -6,11 +6,11 @@
 #include <stdint.h>
 #include <sys/time.h>
 
-static constexpr uint64_t AMQP_MS_PER_S = 1'000;
-static constexpr uint64_t AMQP_US_PER_MS = 1'000;
-static constexpr uint64_t AMQP_NS_PER_S = 1'000'000'000;
-static constexpr uint64_t AMQP_NS_PER_MS = 1'000'000;
-static constexpr uint64_t AMQP_NS_PER_US = 1'000;
+static constexpr uint64_t AMQP_MS_PER_S = 1000;
+static constexpr uint64_t AMQP_US_PER_MS = 1000;
+static constexpr uint64_t AMQP_NS_PER_S = 1000000000;
+static constexpr uint64_t AMQP_NS_PER_MS = 1000000;
+static constexpr uint64_t AMQP_NS_PER_US = 1000;
 
 /* This represents a point in time in reference to a monotonic clock.
  *
@@ -81,10 +81,11 @@ int amqp_time_tv_until(amqp_time_t time, struct timeval *in,
 
 /* Test whether current time is past the provided time.
  *
- * TODO: this isn't a great interface to use. Fix this.
+ * This helper follows the library's status-code convention so callers can
+ * distinguish an expired deadline from a timer failure.
  *
- * Return AMQP_STATUS_OK if time has not past
- * Return AMQP_STATUS_TIMEOUT if time has past
+ * Return AMQP_STATUS_OK if time has not passed
+ * Return AMQP_STATUS_TIMEOUT if time has passed
  * Return AMQP_STATUS_TIMER_FAILURE if the underlying call to get the current
  * timestamp fails.
  */

@@ -132,10 +132,16 @@ start_poll:
   res = poll(&pfd, 1, timeout_ms);
 
   if (0 < res) {
-    /* TODO: optimize this a bit by returning the AMQP_STATUS_SOCKET_ERROR or
-     * equivalent when pdf.revent is POLLHUP or POLLERR, so an extra syscall
-     * doesn't need to be made. */
-    return AMQP_STATUS_OK;
+    if ((pfd.revents & (POLLERR | POLLNVAL)) != 0) {
+      return AMQP_STATUS_SOCKET_ERROR;
+    }
+    if ((pfd.revents & pfd.events) != 0) {
+      return AMQP_STATUS_OK;
+    }
+    if ((pfd.revents & POLLHUP) != 0) {
+      return AMQP_STATUS_CONNECTION_CLOSED;
+    }
+    return AMQP_STATUS_SOCKET_ERROR;
   } else if (0 == res) {
     return AMQP_STATUS_TIMEOUT;
   } else {
@@ -222,6 +228,14 @@ ssize_t amqp_try_send(amqp_connection_state_t state, const void *buf,
   ssize_t len_left = (size_t)len;
 
 start_send:
+  res = amqp_time_has_past(deadline);
+  if (AMQP_STATUS_OK != res) {
+    if (AMQP_STATUS_TIMEOUT == res) {
+      return (ssize_t)len - len_left;
+    }
+    return res;
+  }
+
   res = amqp_socket_send(state->socket, buf_left, len_left, flags);
 
   if (res > 0) {
@@ -397,6 +411,9 @@ static int send_header_inner(amqp_connection_state_t state,
   res = amqp_try_send(state, header, sizeof(header), deadline, AMQP_SF_NONE);
   if (sizeof(header) == res) {
     return AMQP_STATUS_OK;
+  }
+  if (0 <= res) {
+    return AMQP_STATUS_TIMEOUT;
   }
   return (int)res;
 }
@@ -681,8 +698,8 @@ static int wait_frame_inner(amqp_connection_state_t state,
                                amqp_time_first(state->next_recv_heartbeat,
                                                state->next_send_heartbeat));
 
-    /* TODO this needs to wait for a _frame_ and not anything written from the
-     * socket */
+    /* Keep waiting until a complete frame is decoded; recv_with_timeout only
+     * refreshes the socket buffer and receive-heartbeat deadline. */
     res = recv_with_timeout(state, deadline);
 
     if (AMQP_STATUS_TIMEOUT == res) {
@@ -1178,9 +1195,6 @@ static amqp_rpc_reply_t amqp_login_inner(amqp_connection_state_t state,
       goto error_res;
     }
 
-    /* TODO: check that our chosen SASL mechanism is in the list of
-       acceptable mechanisms. Or even let the application choose from
-       the list! */
     if (!sasl_mechanism_in_list(s->mechanisms, sasl_method)) {
       res = AMQP_STATUS_BROKER_UNSUPPORTED_SASL_METHOD;
       goto error_res;

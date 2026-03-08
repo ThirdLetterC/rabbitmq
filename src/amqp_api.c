@@ -15,15 +15,10 @@
 #include "rabbitmq/amqp_socket.h"
 #include "rabbitmq/amqp_time.h"
 
-static constexpr int error_mask =
-    0b0000 '0000' 1111'1111; static constexpr int error_category_mask =
-        0b1111 '1111' 0000'0000;
+static constexpr int error_mask = 0x00FF;
+static constexpr int error_category_mask = 0xFF00;
 
-    enum error_category_enum_ {
-      EC_base = 0,
-      EC_tcp = 1,
-      EC_ssl = 2
-    };
+enum error_category_enum_ { EC_base = 0, EC_tcp = 1, EC_ssl = 2 };
 
 static const char *base_error_strings[] = {
     /* AMQP_STATUS_OK 0x0 */
@@ -177,20 +172,6 @@ int amqp_basic_publish(amqp_connection_state_t state, amqp_channel_t channel,
   m.mandatory = mandatory;
   m.immediate = immediate;
   m.ticket = 0;
-
-  /* TODO(alanxz): this heartbeat check is happening in the wrong place, it
-   * should really be done in amqp_try_send/writev */
-  res = amqp_time_has_past(state->next_recv_heartbeat);
-  if (AMQP_STATUS_TIMER_FAILURE == res) {
-    return res;
-  } else if (AMQP_STATUS_TIMEOUT == res) {
-    res = amqp_try_recv(state);
-    if (AMQP_STATUS_TIMEOUT == res) {
-      return AMQP_STATUS_HEARTBEAT_TIMEOUT;
-    } else if (AMQP_STATUS_OK != res) {
-      return res;
-    }
-  }
 
   res = amqp_send_method_inner(state, channel, AMQP_BASIC_PUBLISH_METHOD, &m,
                                AMQP_SF_MORE, amqp_time_infinite());
@@ -348,7 +329,7 @@ int amqp_set_handshake_timeout(amqp_connection_state_t state,
                                const struct timeval *timeout) {
   if (timeout) {
     if (timeout->tv_sec < 0 || timeout->tv_usec < 0 ||
-        timeout->tv_usec >= 1 '000' 000) {
+        timeout->tv_usec >= 1000000) {
       return AMQP_STATUS_INVALID_PARAMETER;
     }
     state->internal_handshake_timeout = *timeout;
@@ -368,7 +349,7 @@ int amqp_set_rpc_timeout(amqp_connection_state_t state,
                          const struct timeval *timeout) {
   if (timeout) {
     if (timeout->tv_sec < 0 || timeout->tv_usec < 0 ||
-        timeout->tv_usec >= 1 '000' 000) {
+        timeout->tv_usec >= 1000000) {
       return AMQP_STATUS_INVALID_PARAMETER;
     }
     state->rpc_timeout = &state->internal_rpc_timeout;
